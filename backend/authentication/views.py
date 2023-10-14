@@ -70,6 +70,22 @@ class  UserViewset(ModelViewSet):
         user.is_banned = False
         user.save()
         return Response({'message': 'Пользователь разбанен'})
+    
+    @action(methods=['POST'], detail=True, permission_classes=[IsAdminUser], url_path="grant-admin-status")
+    def grant_admin_status(self, request, pk=None):
+        user = self.get_object()
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+        return Response({'message': 'Статус админа присвоен'})
+
+    @action(methods=['POST'], detail=True, permission_classes=[IsAdminUser], url_path="revoke-admin-status")
+    def revoke_admin_status(self, request, pk=None):
+        user = self.get_object()
+        user.is_staff = False
+        user.is_superuser = False
+        user.save()
+        return Response({'message': 'Статус админа снят'})
 
         
 
