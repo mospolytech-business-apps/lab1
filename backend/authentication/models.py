@@ -16,6 +16,7 @@ class User(AbstractBaseUser,PermissionsMixin):
     is_staff=models.BooleanField(verbose_name='Персонал',default=False)
     is_superuser=models.BooleanField(verbose_name='Администратор',default=False)
     is_client = models.BooleanField(verbose_name='Клиент', default=False)
+    is_banned = models.BooleanField(verbose_name='Заблокирован', default=False)
 
     USERNAME_FIELD='email'
     REQUIRED_FIELDS=['first_name','last_name']

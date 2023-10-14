@@ -21,25 +21,28 @@ class  UserViewset(ModelViewSet):
         return Response({'massage': 'success'})
     
 
-    @action (methods=['POST'],detail= False,url_path="login")
-    def login(self,request):
-        if 'email' not in request.data: 
-            raise ValidationError({'error':'email must not be empty'})
-            
+    @action(methods=['POST'], detail=False, url_path="login")
+    def login(self, request):
+        if 'email' not in request.data:
+            raise ValidationError({'error': 'email must not be empty'})
+
         if 'password' not in request.data:
-            raise ValidationError({'error':'password must not be empty'})
-        
+            raise ValidationError({'error': 'password must not be empty'})
+
         try:
-            user=User.objects.get(email=request.data['email'])
+            user = User.objects.get(email=request.data['email'])
         except User.DoesNotExist:
-            raise NotFound({'error':'user with this email was not found'})
-        
+            raise NotFound({'error': 'user with this email was not found'})
+
+        if user.is_banned:
+            raise AuthenticationFailed({'error': 'You are banned. Please contact support.'})
+
         if not user.check_password(request.data['password']):
-            raise AuthenticationFailed({'error':'incorrect password'})
-        
-        refresh= RefreshToken.for_user(user)
-        response= Response()
-        response.data={'access':str(refresh.access_token)}
+            raise AuthenticationFailed({'error': 'incorrect password'})
+
+        refresh = RefreshToken.for_user(user)
+        response = Response()
+        response.data = {'access': str(refresh.access_token)}
         return response
 
     @action (methods=['GET'],detail= False,permission_classes=[IsAuthenticated],url_path="me")
@@ -53,6 +56,20 @@ class  UserViewset(ModelViewSet):
          users = User.objects.all()
          serializer = self.serializer_class(users, many=True)
          return Response(serializer.data)
+
+    @action(methods=['POST'],detail=True,permission_classes=[IsAdminUser], url_path="ban-users")
+    def ban(self, request, pk=None):
+        user = self.get_object()
+        user.is_banned = True
+        user.save()
+        return Response({'message': 'Пользователь забанен'})
+
+    @action(methods=['POST'],detail=True,permission_classes=[IsAdminUser], url_path="unban-users")
+    def unban(self, request, pk=None):
+        user = self.get_object()
+        user.is_banned = False
+        user.save()
+        return Response({'message': 'Пользователь разбанен'})
 
         
 
