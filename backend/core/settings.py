@@ -56,7 +56,9 @@ INSTALLED_APPS = [
     "tickets",
     "amenities",
     "amenity_tickets",
-    "amenity_cabin_types"
+    "amenity_cabin_types",
+    'django_filters',
+    
 ]
 
 MIDDLEWARE = [
