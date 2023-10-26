@@ -1,6 +1,6 @@
 from django.db import models
 from amenities.models import Amenity
-from сabintyps.models import CabinType  # Используйте фактическое имя приложения
+from сabintyps.models import CabinType  
 
 class AmenityCabinType(models.Model):
     amenity = models.ForeignKey(Amenity, on_delete=models.CASCADE)

@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet
+from .serializers import AmenityCabinTypeSerializer
+from .models import AmenityCabinType
 
-# Create your views here.
+class AmenityCabinTypeViewset(ModelViewSet):
+    queryset=AmenityCabinType.objects.all()
+    serializer_class=AmenityCabinTypeSerializer

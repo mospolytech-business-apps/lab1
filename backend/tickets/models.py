@@ -1,5 +1,3 @@
-# tickets/models.py
-
 from django.db import models
 from authentication.models import User
 from schedules.models import Schedule
