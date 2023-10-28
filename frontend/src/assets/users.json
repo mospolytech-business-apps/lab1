@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "Peter",
+    "lastName": "Severin",
+    "age": 40,
+    "office": "Abu Dhabi",
+    "userRole": "administrator",
+    "emailAddress": "peter.s@yahoo.com",
+    "loginStatus": "enabled"
+  },
+  {
+    "id": 2,
+    "name": "Henri",
+    "lastName": "Kerasha",
+    "age": 24,
+    "office": "Abu Dhabi",
+    "userRole": "office user",
+    "emailAddress": "severin2007@gmail.com",
+    "loginStatus": "notSet"
+  },
+  {
+    "id": 3,
+    "name": "Olga",
+    "lastName": "Navin",
+    "age": 65,
+    "office": "Bahrain",
+    "userRole": "administrator",
+    "emailAddress": "olga.olga@gmail.com",
+    "loginStatus": "notSet"
+  },
+  {
+    "id": 4,
+    "name": "Henri",
+    "lastName": "Morf",
+    "age": 34,
+    "office": "Doha",
+    "userRole": "office user",
+    "emailAddress": "h.morg@amonic.com",
+    "loginStatus": "enabled"
+  },
+  {
+    "id": 5,
+    "name": "Mahan",
+    "lastName": "Aliof",
+    "age": 45,
+    "office": "Bahrain",
+    "userRole": "administrator",
+    "emailAddress": "aliof1985@gmail.com",
+    "loginStatus": "disabled"
+  },
+  {
+    "id": 6,
+    "name": "Iraj",
+    "lastName": "Asadi",
+    "age": 37,
+    "office": "Doha",
+    "userRole": "office user",
+    "emailAddress": "asadi.irajj@amonic.com",
+    "loginStatus": "disabled"
+  }
+]
