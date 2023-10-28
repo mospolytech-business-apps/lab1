@@ -1,9 +1,33 @@
 <template>
-  <div class="container">
-    <header>
-      <h1>AMONIC Airlines Automation System</h1>
-    </header>
-    <main>
+  <HeaderComponent />
+  <nav class="menu">
+    <button class="menu-btn">Add user</button>
+    <button class="menu-btn">Exit</button>
+  </nav>
+  <main class="main">
+    <div class="filter">
+      <p class="filter-title">Office:</p>
+      <select
+        class="select"
+        id="company-filter"
+        style="
+          border-radius: 5px;
+          border: 1px solid black;
+          padding: 0.25rem 1rem;
+          width: 100%;
+        "
+      >
+        <option value="">All Offices</option>
+        <option
+          v-for="company in companies"
+          :key="company.id"
+          :value="company.id"
+        >
+          {{ company.name }}
+        </option>
+      </select>
+    </div>
+    <div class="table-wrapper">
       <table class="table">
         <thead>
           <tr>
@@ -36,20 +60,19 @@
           </tr>
         </tbody>
       </table>
-      <div class="buttons">
-        <button class="btn" @click="changeRole(selectedUser)">
-          Change Role
-        </button>
-        <button class="btn" @click="enableDisableLogin(selectedUser)">
-          Enable/Disable Login
-        </button>
-      </div>
-    </main>
-  </div>
+    </div>
+    <div class="buttons">
+      <button class="btn" @click="changeRole(selectedUser)">Change Role</button>
+      <button class="btn" @click="enableDisableLogin(selectedUser)">
+        Enable/Disable Login
+      </button>
+    </div>
+  </main>
 </template>
 
 <script setup>
 import { ref, onUnmounted } from "vue";
+import HeaderComponent from "@/components/HeaderComponent.vue";
 
 const apiUrl = "src/assets/users.json";
 
@@ -89,6 +112,51 @@ fetchUsers();
 </script>
 
 <style scoped>
+.main {
+  margin: 1rem 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  gap: 1rem;
+  overflow: scroll;
+}
+
+.menu {
+  display: flex;
+  justify-content: left;
+  gap: 0.25rem;
+  min-height: 30px;
+  border-bottom: 2px solid black;
+}
+
+.menu-btn {
+  border-radius: 5px;
+  background: 0;
+  border: 0;
+  cursor: pointer;
+}
+.menu-btn::first-letter {
+  text-decoration: underline;
+}
+.filter {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+}
+
+.filter-title {
+  margin: 0;
+}
+
+.select {
+  border-radius: 5px;
+  border: 1px solid black;
+  height: 100%;
+  padding: 0.25rem 1rem;
+  width: 100%;
+}
 .selected {
   box-shadow: inset 0 0 0 2px black;
 }
@@ -100,16 +168,34 @@ fetchUsers();
   background-color: salmon;
 }
 .notSet {
-  background-color: lightgray;
+  background-color: white;
 }
 
-.table {
+thead {
+  background-color: lightgray;
+  border-bottom: 2px solid black;
+}
+
+.menu-btn {
+}
+
+.table-wrapper {
+  flex-grow: 1;
   width: 100%;
+  border: 2px solid black;
+}
+.table {
   border-collapse: collapse;
-  margin-bottom: 1rem;
 }
 .buttons {
   display: flex;
   gap: 5rem;
+}
+.btn {
+  padding: 0.25rem 3rem;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: white;
+  cursor: pointer;
 }
 </style>
