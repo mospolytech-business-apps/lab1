@@ -1,9 +1,11 @@
 <template>
-  <div></div>
+  <div class="container">
+    <HeaderComponent title="Airlines Short Summary Page" />
+  </div>
 </template>
 
 <script setup>
-defineOptions({});
+import HeaderComponent from "@/components/HeaderComponent.vue";
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

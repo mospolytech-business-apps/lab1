@@ -1,5 +1,5 @@
 <template>
-  <HeaderComponent />
+  <HeaderComponent title="Manage Users" />
   <nav class="menu">
     <button class="menu-btn">Add user</button>
     <button class="menu-btn">Exit</button>
@@ -92,7 +92,6 @@ const selectedUser = ref(null);
 
 const selectUser = (user) => {
   selectedUser.value = user;
-  console.log(user.id);
 };
 
 const changeRole = (user) => {
@@ -120,7 +119,6 @@ fetchUsers();
   justify-content: center;
   align-items: start;
   gap: 1rem;
-  overflow: scroll;
 }
 
 .menu {
@@ -183,9 +181,11 @@ thead {
   flex-grow: 1;
   width: 100%;
   border: 2px solid black;
+  overflow: scroll;
 }
 .table {
   border-collapse: collapse;
+  overflow: scroll;
 }
 .buttons {
   display: flex;

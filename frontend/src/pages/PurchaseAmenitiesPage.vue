@@ -1,15 +1,11 @@
 <template>
-    <div>
-
-    </div>
+  <div class="container">
+    <HeaderComponent title="Purchase Amenities" />
+  </div>
 </template>
 
 <script setup>
-defineOptions({
-  name: 'PurchaseAmenitiesPage',
-})
+import HeaderComponent from "@/components/HeaderComponent.vue";
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

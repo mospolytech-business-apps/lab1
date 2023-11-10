@@ -1,5 +1,5 @@
 <template>
-  <HeaderComponent title="Administrator Home Page" />
+  <HeaderComponent title="Admin Home Page" />
   <main class="main" align="center">
     <router-link class="link" to="/manage-users">Manage Users</router-link>
     <router-link class="link" to="/manage-flight-schedules"
@@ -28,7 +28,7 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
   overflow: scroll;
 }
 .link {
-  min-width: 20rem;
+  min-width: 25rem;
   margin: 1rem;
   padding: 1rem;
   border: 1px solid black;

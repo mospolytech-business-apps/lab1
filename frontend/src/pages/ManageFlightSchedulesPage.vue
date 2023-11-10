@@ -1,7 +1,7 @@
 <template>
-  <div class="manage-flight-schedules">
-    <h1>Manage Flight Schedules</h1>
-    <div class="filter-bar">
+  <main>
+    <HeaderComponent title="Manage Flight Schedules" />
+    <section class="filter-bar">
       <select v-model="filter.from">
         <option value="">From</option>
         <option v-for="airport in airports" :value="airport.code">
@@ -30,8 +30,8 @@
         placeholder="Flight Number"
       />
       <button @click="applyFilter">Apply</button>
-    </div>
-    <div class="flight-list">
+    </section>
+    <section class="flight-list">
       <table>
         <thead>
           <tr>
@@ -65,15 +65,16 @@
           </tr>
         </tbody>
       </table>
-    </div>
+    </section>
     <div class="import-changes">
       <button @click="importChanges">Import Changes</button>
     </div>
-  </div>
+  </main>
 </template>
 
 <script>
 import { defineComponent } from "vue";
+import HeaderComponent from "@/components/HeaderComponent.vue";
 
 export default defineComponent({
   name: "ManageFlightSchedules",

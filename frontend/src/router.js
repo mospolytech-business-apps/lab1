@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useUserRoleStore } from "@/store/userRole";
+import { useUserRoleStore } from "@/stores/userRole";
 
 import AdminHomePage from "@/pages/AdminHomePage.vue";
 import ClientSurveyPage from "@/pages/ClientSurveyPage.vue";
@@ -11,6 +11,7 @@ import PurchaseAmenitiesPage from "@/pages/PurchaseAmenitiesPage.vue";
 import SearchFlightSchedulesPage from "@/pages/SearchFlightSchedulesPage.vue";
 import UserHomePage from "@/pages/UserHomePage.vue";
 import AirlinesShortSummaryPage from "@/pages/AirlinesShortSummaryPage.vue";
+import ParentTest from "@/pages/ParentTest.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

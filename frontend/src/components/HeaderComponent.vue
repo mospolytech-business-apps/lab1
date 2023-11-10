@@ -1,28 +1,32 @@
 <template>
   <header class="header">
     <h1 class="title">{{ props.title }}</h1>
-    <button class="exit-icon">
+    <button @click="closeButtonHandler" class="exit-btn">
       <img
         width="20"
         src="https://cdn2.iconfinder.com/data/icons/general-ui-icons/800/delete85-1024.png"
-        alt="Exit icon"
+        alt="Exit button"
       />
     </button>
   </header>
-  <PopupMenu />
 </template>
 
 <script setup>
-import PopupMenu from "@/components/PopupMenu.vue";
+import reload from "@/scripts/reload.js";
 const props = defineProps({
   title: {
     type: String,
     default: "Amonic Airlines Automation System",
   },
+  closeButtonHandler: {
+    type: Function,
+    required: false,
+    default: reload,
+  },
 });
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .header {
   width: 100%;
   display: flex;
@@ -37,8 +41,25 @@ const props = defineProps({
   margin: 0;
   padding-inline-start: 0.5rem;
 }
-.exit-icon {
+
+.exit-btn {
   border: 0;
   background: 0;
+}
+
+.exit-btn:hover {
+  cursor: pointer;
+}
+
+.modal {
+  width: 300px;
+  padding: 16px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>

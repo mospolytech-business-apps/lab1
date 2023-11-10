@@ -1,19 +1,18 @@
 <template>
-  <div class="container">
-    <h1>AMONIC Airlines Automation System</h1>
+  <HeaderComponent title="User Home Page" />
 
-    <div class="time-spent-section">
-      <h2>Time spent on system</h2>
-      <p>{{ timeSpent }}</p>
+  <main class="container">
+    <h1>Hi <b>user</b>, Welcome to ANOMIC AIRLINES</h1>
+    <div class="metrics">
+      <p>
+        Time spent on system: <b>{{ timeSpent || "–" }}</b>
+      </p>
+      <p>
+        Number of crashes: <b>{{ numberOfCrashes || "–" }}</b>
+      </p>
     </div>
 
-    <div class="number-of-crashes-section">
-      <h2>Number of crashes</h2>
-      <p>{{ numberOfCrashes }}</p>
-    </div>
-
-    <div class="crashes-table-section">
-      <h2>Crashes</h2>
+    <div class="table-wrapper">
       <table class="table">
         <thead>
           <tr>
@@ -35,31 +34,42 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </main>
+  <NoLogoutModal
+    :open="isNoLogoutModalOpen"
+    @submit="logoutStore.setLogoutInformation;"
+    @close="isNoLogoutModalOpen = false"
+  />
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script setup>
+import { ref } from "vue";
+import HeaderComponent from "@/components/HeaderComponent.vue";
+import NoLogoutModal from "../components/NoLogoutModal.vue";
+import { useLogoutStore } from "@/stores/logout";
 
-export default defineComponent({
-  name: 'TimeSpentOnSystemPage',
-  data() {
-    return {
-      timeSpent: '00:19:03',
-      numberOfCrashes: 1,
-      crashes: [
-        {
-          id: 1,
-          date: '02/13/2017',
-          loginTime: '17:15',
-          logoutTime: '18:45',
-          timeSpentOnSystem: '1:30',
-          unsuccessfulLogoutReason: 'Power outage',
-        },
-      ],
-    };
+const logoutStore = useLogoutStore();
+
+const crashes = [
+  {
+    id: 1,
+    date: "2021-05-01",
+    loginTime: "10:00:00",
+    logoutTime: "10:30:00",
+    timeSpentOnSystem: "00:30:00",
+    unsuccessfulLogoutReason: "System crashed",
   },
-});
+  {
+    id: 1,
+    date: "2021-05-01",
+    loginTime: "10:00:00",
+    logoutTime: "10:30:00",
+    timeSpentOnSystem: "00:30:00",
+    unsuccessfulLogoutReason: "System crashed",
+  },
+];
+
+const isNoLogoutModalOpen = ref(true);
 </script>
 
 <style>
@@ -68,20 +78,34 @@ export default defineComponent({
   margin: 0 auto;
 }
 
-.time-spent-section,
-.number-of-crashes-section,
 .crashes-table-section {
   margin-bottom: 20px;
 }
 
 .table {
-  width: 100%;
   border-collapse: collapse;
+  flex-grow: 1;
+  width: 100%;
+  border: 2px solid black;
+  overflow: scroll;
 }
 
 .table th,
 .table td {
   border: 1px solid black;
   padding: 5px;
+}
+
+.table-wrapper {
+}
+.table {
+  border-collapse: collapse;
+  overflow: scroll;
+}
+
+.metrics {
+  display: flex;
+  justify-content: end;
+  gap: 3rem;
 }
 </style>

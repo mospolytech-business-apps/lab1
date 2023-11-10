@@ -22,7 +22,7 @@
 <script setup>
 import { ref } from "vue";
 import router from "../router";
-import { useUserRoleStore } from "@/store/userRole.js";
+import { useUserRoleStore } from "@/stores/userRole.js";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 
 const userRoleStore = useUserRoleStore();
@@ -40,7 +40,6 @@ const onSubmit = () => {
   }
 
   userRoleStore.setUserRole(userRole);
-  console.log(userRoleStore.userRole);
 
   router.push("/");
 };
