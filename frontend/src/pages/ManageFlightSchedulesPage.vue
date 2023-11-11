@@ -1,5 +1,8 @@
 <template>
   <UIHeader title="Manage Flight Schedules" />
+  <UINav class="menu">
+    <button @click="$router.push('/')">Exit</button>
+  </UINav>
   <main class="main">
     <fieldset class="filters">
       <legend>Filter by</legend>
@@ -125,6 +128,7 @@
 <script setup>
 import UIHeader from "@/components/UIHeader.vue";
 import UIButton from "@/components/UIButton.vue";
+import UINav from "@/components/UINav.vue";
 import ScheduleEditModal from "@/components/ScheduleEditModal.vue";
 import ApplyScheduleChangesModal from "@/components/ApplyScheduleChangesModal.vue";
 import { ref } from "vue";
@@ -243,6 +247,7 @@ fetchFlights();
 }
 .select {
   text-align-last: center;
+  width: 100%;
   padding-inline-end: 2rem;
   outline: none;
   border: none;
@@ -261,7 +266,14 @@ fetchFlights();
 }
 
 .table {
-  border: 0;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td,
+th {
+  border: 1px solid black;
+  text-align: start;
 }
 
 .buttons {
@@ -273,7 +285,6 @@ fetchFlights();
   background-color: lightgray;
   position: sticky;
   top: 0;
-  box-shadow: 1px 1px 1px 1px black;
 }
 .import-changes {
   margin-left: auto;

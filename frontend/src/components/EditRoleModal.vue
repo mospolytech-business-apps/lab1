@@ -42,8 +42,8 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from "vue";
 import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
 
 const props = defineProps({
   open: { type: Boolean, required: true },

@@ -8,7 +8,11 @@
     <router-link class="link" to="/client-survey-summary"
       >Client Survey Summary</router-link
     >
-    <router-link class="link" to="/airlines-short-summary-page"
+    <router-link class="link" to="/amenities-report"
+      >Amenities Report</router-link
+    >
+
+    <router-link class="link" to="/airlines-short-summary"
       >Airlines Short Summary Page</router-link
     >
   </main>

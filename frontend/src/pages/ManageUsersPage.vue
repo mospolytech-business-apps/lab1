@@ -2,7 +2,7 @@
   <UIHeader title="Manage Users" />
   <UINav>
     <button @click="openAddUserModal">Add user</button>
-    <button @click="reload">Exit</button>
+    <button @click="$router.push('/')">Exit</button>
   </UINav>
   <main class="main">
     <div class="filter">
@@ -78,12 +78,11 @@
 
 <script setup>
 import { ref, onUnmounted } from "vue";
-import AddUserModal from "../components/AddUserModal.vue";
-import EditRoleModal from "../components/EditRoleModal.vue";
+import AddUserModal from "@/components/AddUserModal.vue";
+import EditRoleModal from "@/components/EditRoleModal.vue";
 import UIHeader from "@/components/UIHeader.vue";
 import UINav from "@/components/UINav.vue";
 import UIButton from "@/components/UIButton.vue";
-import reload from "@/scripts/reload.js";
 
 const isAddUserModalOpen = ref(false);
 const isEditRoleModalOpen = ref(false);
@@ -143,7 +142,7 @@ fetchUsers();
 
 <style scoped>
 .main {
-  margin: 1rem 1rem;
+  margin: 1rem;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -188,6 +187,11 @@ thead {
   border-bottom: 2px solid black;
 }
 
+td,
+th {
+  border: 1px solid black;
+}
+
 .table-wrapper {
   flex-grow: 1;
   width: 100%;
@@ -195,9 +199,11 @@ thead {
   overflow: scroll;
 }
 .table {
+  width: 100%;
   border-collapse: collapse;
   overflow: scroll;
 }
+
 .buttons {
   display: flex;
   gap: 5rem;

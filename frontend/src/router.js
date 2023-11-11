@@ -10,6 +10,7 @@ import ManageUsersPage from "@/pages/ManageUsersPage.vue";
 import PurchaseAmenitiesPage from "@/pages/PurchaseAmenitiesPage.vue";
 import SearchFlightsPage from "@/pages/SearchFlightsPage.vue";
 import UserHomePage from "@/pages/UserHomePage.vue";
+import AmenitiesReportPage from "@/pages/AmenitiesReportPage.vue";
 import AirlinesShortSummaryPage from "@/pages/AirlinesShortSummaryPage.vue";
 
 const router = createRouter({
@@ -31,8 +32,13 @@ const router = createRouter({
       },
     },
     {
-      path: "/airlines-short-summary-page",
-      name: "airlines-short-summary-page",
+      path: "/amenities-report",
+      name: "amenities-report",
+      component: AmenitiesReportPage,
+    },
+    {
+      path: "/airlines-short-summary",
+      name: "airlines-short-summary",
       component: AirlinesShortSummaryPage,
     },
     {
@@ -75,7 +81,7 @@ const accessList = {
     "/manage-flight-schedules",
     "/client-survey-summary",
     "/amenities-report",
-    "/airlines-short-summary-page",
+    "/airlines-short-summary",
   ],
   user: [
     "/",

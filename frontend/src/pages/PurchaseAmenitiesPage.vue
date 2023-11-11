@@ -1,5 +1,8 @@
 <template>
   <UIHeader title="Purchase Amenities" />
+  <UINav class="menu">
+    <button @click="$router.push('/')">Exit</button>
+  </UINav>
   <main class="main">
     <div class="search-booking">
       <label class="field">
@@ -62,9 +65,12 @@
     </fieldset>
     <div class="bottom-section">
       <div class="summary">
-        <p>Items selected: [$XX]</p>
-        <p>Duties and taxes: [$XX]</p>
-        <p>Total payable: [$XX]</p>
+        <p>Items selected:</p>
+        <p>Duties and taxes:</p>
+        <p>Total payable:</p>
+        <p>[$XX]</p>
+        <p>[$XX]</p>
+        <p>[$XX]</p>
       </div>
       <div class="btns">
         <UIButton>Save and Confirm</UIButton>
@@ -78,6 +84,7 @@
 <script setup>
 import UIHeader from "@/components/UIHeader.vue";
 import UIButton from "@/components/UIButton.vue";
+import UINav from "@/components/UINav.vue";
 import AmenitiesReportModal from "@/components/AmenitiesReportModal.vue";
 import { ref } from "vue";
 
@@ -163,9 +170,8 @@ const isAmenitiesReportModalOpen = ref(false);
   justify-content: space-between;
 }
 .summary {
-  display: flex;
-  gap: 1rem;
-  flex-direction: column;
+  columns: 2;
+  column-gap: 1rem;
 }
 .summary > * {
   margin: 0;

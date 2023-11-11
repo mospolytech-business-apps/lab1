@@ -1,10 +1,10 @@
 <template>
   <UIHeader title="Flight Satisfaction Survey Reports" />
-  <nav class="menu">
-    <button class="menu-btn">View Results Summary</button>
-    <button class="menu-btn">View Detailed Summary</button>
-    <button class="menu-btn">Exit</button>
-  </nav>
+  <UINav class="menu">
+    <button>View Results Summary</button>
+    <button>View Detailed Summary</button>
+    <button @click="$router.push('/')">Exit</button>
+  </UINav>
   <main class="main">
     <h1 class="visually-hidden">Client Survey Summary</h1>
     <div class="table-container">
@@ -54,6 +54,7 @@
 
 <script setup>
 import UIHeader from "@/components/UIHeader.vue";
+import UINav from "@/components/UINav.vue";
 </script>
 
 <style lang="scss" scoped>

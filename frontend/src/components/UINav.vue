@@ -1,11 +1,11 @@
 <template>
-  <nav class="menu">
+  <nav class="nav-menu">
     <slot></slot>
   </nav>
 </template>
 
 <style>
-.menu {
+.nav-menu {
   display: flex;
   justify-content: left;
   gap: 0.25rem;
@@ -13,20 +13,20 @@
   border-bottom: 2px solid black;
 }
 
-.menu > * {
+.nav-menu > * {
   background: 0;
   border: 0;
   cursor: pointer;
 }
-.menu > *::first-letter {
+.nav-menu > *::first-letter {
   text-decoration: underline;
 }
 
-.menu > *:hover {
+.nav-menu > *:hover {
   background-color: lightgray;
 }
 
-.menu > *:active {
+.nav-menu > *:active {
   background-color: gray;
 }
 </style>

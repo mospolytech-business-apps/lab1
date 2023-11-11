@@ -30,7 +30,6 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
 import UIHeader from "@/components/UIHeader.vue";
 import UIButton from "@/components/UIButton.vue";
 

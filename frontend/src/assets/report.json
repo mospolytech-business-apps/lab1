@@ -1,0 +1,22 @@
+{
+  "amenities": [
+    "WI-FI 50mb",
+    "Extra Blanket",
+    "Two Neighboring Seats Free",
+    "Laptop Rental"
+  ],
+  "statistics": [
+    {
+      "class": "Economy",
+      "data": [60, 0, 2, 4]
+    },
+    {
+      "class": "Business",
+      "data": [12, 3, 0, 0]
+    },
+    {
+      "class": "First Class",
+      "data": [17, 0, 5, 7]
+    }
+  ]
+}

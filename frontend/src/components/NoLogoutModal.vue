@@ -28,7 +28,6 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, onMounted } from "vue";
 import { useLogoutStore } from "@/stores/logout";
 import UIHeader from "@/components/UIHeader.vue";
 
