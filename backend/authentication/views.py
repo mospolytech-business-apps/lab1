@@ -23,14 +23,14 @@ class  UserViewset(ModelViewSet):
 
     @action(methods=['POST'], detail=False, url_path="login")
     def login(self, request):
-        if 'email' not in request.data:
+        if 'Email' not in request.data:
             raise ValidationError({'error': 'email must not be empty'})
 
         if 'password' not in request.data:
             raise ValidationError({'error': 'password must not be empty'})
 
         try:
-            user = User.objects.get(email=request.data['email'])
+            user = User.objects.get(email=request.data['Email'])
         except User.DoesNotExist:
             raise NotFound({'error': 'user with this email was not found'})
 
