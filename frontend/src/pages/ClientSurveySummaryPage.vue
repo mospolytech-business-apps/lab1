@@ -1,5 +1,5 @@
 <template>
-  <HeaderComponent title="Flight Satisfaction Survey Reports" />
+  <UIHeader title="Flight Satisfaction Survey Reports" />
   <nav class="menu">
     <button class="menu-btn">View Results Summary</button>
     <button class="menu-btn">View Detailed Summary</button>
@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import UIHeader from "@/components/UIHeader.vue";
 </script>
 
 <style lang="scss" scoped>

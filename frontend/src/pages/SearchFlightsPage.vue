@@ -1,6 +1,6 @@
 <template>
   <div class="flight-search">
-    <HeaderComponent title="Search For Flights" />
+    <UIHeader title="Search For Flights" />
     <form @submit="searchFlights">
       <div class="input-group">
         <label for="from">From:</label>
@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import UIHeader from "@/components/UIHeader.vue";
 </script>
 
 <style scoped>

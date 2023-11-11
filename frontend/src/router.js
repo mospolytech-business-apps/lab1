@@ -8,10 +8,9 @@ import LoginPage from "@/pages/LoginPage.vue";
 import ManageFlightSchedulesPage from "@/pages/ManageFlightSchedulesPage.vue";
 import ManageUsersPage from "@/pages/ManageUsersPage.vue";
 import PurchaseAmenitiesPage from "@/pages/PurchaseAmenitiesPage.vue";
-import SearchFlightSchedulesPage from "@/pages/SearchFlightSchedulesPage.vue";
+import SearchFlightsPage from "@/pages/SearchFlightsPage.vue";
 import UserHomePage from "@/pages/UserHomePage.vue";
 import AirlinesShortSummaryPage from "@/pages/AirlinesShortSummaryPage.vue";
-import ParentTest from "@/pages/ParentTest.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,9 +51,9 @@ const router = createRouter({
       component: PurchaseAmenitiesPage,
     },
     {
-      path: "/search-flight-schedules",
-      name: "search-flight-schedules",
-      component: SearchFlightSchedulesPage,
+      path: "/search-flights",
+      name: "search-flights",
+      component: SearchFlightsPage,
     },
     {
       path: "/client-survey",
@@ -76,6 +75,7 @@ const accessList = {
     "/manage-flight-schedules",
     "/client-survey-summary",
     "/amenities-report",
+    "/airlines-short-summary-page",
   ],
   user: [
     "/",

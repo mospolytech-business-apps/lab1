@@ -1,9 +1,9 @@
 <template>
-  <HeaderComponent title="Manage Users" />
-  <nav class="menu">
-    <button class="menu-btn">Add user</button>
-    <button class="menu-btn">Exit</button>
-  </nav>
+  <UIHeader title="Manage Users" />
+  <UINav>
+    <button @click="openAddUserModal">Add user</button>
+    <button @click="reload">Exit</button>
+  </UINav>
   <main class="main">
     <div class="filter">
       <p class="filter-title">Office:</p>
@@ -62,31 +62,61 @@
       </table>
     </div>
     <div class="buttons">
-      <button class="btn" @click="changeRole(selectedUser)">Change Role</button>
-      <button class="btn" @click="enableDisableLogin(selectedUser)">
+      <UIButton @click="changeRole(selectedUser)">Change Role</UIButton>
+      <UIButton @click="enableDisableLogin(selectedUser)">
         Enable/Disable Login
-      </button>
+      </UIButton>
     </div>
   </main>
+  <AddUserModal :open="isAddUserModalOpen" @close="closeAddUserModal" />
+  <EditRoleModal
+    :user="editableUser"
+    :open="isEditRoleModalOpen"
+    @close="closeEditRoleModal"
+  />
 </template>
 
 <script setup>
 import { ref, onUnmounted } from "vue";
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import AddUserModal from "../components/AddUserModal.vue";
+import EditRoleModal from "../components/EditRoleModal.vue";
+import UIHeader from "@/components/UIHeader.vue";
+import UINav from "@/components/UINav.vue";
+import UIButton from "@/components/UIButton.vue";
+import reload from "@/scripts/reload.js";
+
+const isAddUserModalOpen = ref(false);
+const isEditRoleModalOpen = ref(false);
+const editableUser = ref(null);
+
+const openAddUserModal = () => {
+  isAddUserModalOpen.value = true;
+};
+
+const closeAddUserModal = () => {
+  isAddUserModalOpen.value = false;
+};
+
+const openEditRoleModal = () => {
+  isEditRoleModalOpen.value = true;
+};
+
+const closeEditRoleModal = () => {
+  isEditRoleModalOpen.value = false;
+};
 
 const apiUrl = "src/assets/users.json";
-
 const fetchUsers = async () => {
   try {
     const response = await fetch(apiUrl);
     const data = await response.json();
-    users.value = data; // Store the fetched users
+    users.value = data;
   } catch (error) {
     console.error("Error fetching users:", error);
   }
 };
 
-const users = ref([]); // Define a ref to hold the users
+const users = ref([]);
 
 const selectedUser = ref(null);
 
@@ -95,11 +125,12 @@ const selectUser = (user) => {
 };
 
 const changeRole = (user) => {
-  user.userRole =
-    user.userRole === "administrator" ? "office user" : "administrator";
+  editableUser.value = user;
+  openEditRoleModal();
 };
 
 const enableDisableLogin = (user) => {
+  openEditRoleModal;
   user.loginStatus = user.loginStatus === "enabled" ? "disabled" : "enabled";
 };
 
@@ -121,23 +152,6 @@ fetchUsers();
   gap: 1rem;
 }
 
-.menu {
-  display: flex;
-  justify-content: left;
-  gap: 0.25rem;
-  min-height: 30px;
-  border-bottom: 2px solid black;
-}
-
-.menu-btn {
-  border-radius: 5px;
-  background: 0;
-  border: 0;
-  cursor: pointer;
-}
-.menu-btn::first-letter {
-  text-decoration: underline;
-}
 .filter {
   align-items: center;
   display: flex;
@@ -174,9 +188,6 @@ thead {
   border-bottom: 2px solid black;
 }
 
-.menu-btn {
-}
-
 .table-wrapper {
   flex-grow: 1;
   width: 100%;
@@ -190,12 +201,5 @@ thead {
 .buttons {
   display: flex;
   gap: 5rem;
-}
-.btn {
-  padding: 0.25rem 3rem;
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: white;
-  cursor: pointer;
 }
 </style>

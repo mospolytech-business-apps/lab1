@@ -1,27 +1,57 @@
 <template>
-  <div class="modal">
-    <div class="main">
-      <h3 class="title">Add User</h3>
-      <input type="email" v-model="email" placeholder="Email address" />
-      <input type="text" v-model="firstName" placeholder="First name" />
-      <input type="text" v-model="lastName" placeholder="Last name" />
-      <se type="text" v-model="officeName" placeholder="Office name" />
-      <select name="officeName" id=""></select>
+  <div v-if="props.open" class="modal">
+    <UIHeader title="Add User" :closeButtonHandler="close" />
+    <main class="main">
+      <input
+        type="email"
+        v-model="formData.email"
+        placeholder="Email address"
+      />
+      <input
+        type="text"
+        v-model="formData.firstName"
+        placeholder="First name"
+      />
+      <input type="text" v-model="formData.lastName" placeholder="Last name" />
+      <input
+        type="text"
+        v-model="formData.officeName"
+        placeholder="Office name"
+      />
+      <select name="officeName" id="">
+        <option v-for="company in companies" :value="company.name">
+          {{ company.name }}
+        </option>
+      </select>
       <input
         type="date"
-        v-model="birthDate"
+        v-model="formData.birthDate"
         placeholder="Birthdate [dd/mm/yy]"
       />
-      <input type="password" v-model="password" placeholder="Password" />
+      <input
+        type="password"
+        v-model="formData.password"
+        placeholder="Password"
+      />
       <div class="actions">
-        <button type="button" @click="saveUser">Save</button>
-        <button type="button" @click="closeModal">Cancel</button>
+        <UIButton @click="saveUser">Save</UIButton>
+        <UIButton @click="close">Cancel</UIButton>
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup>
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import { ref, defineProps, defineEmits } from "vue";
+
+const props = defineProps({
+  open: { type: Boolean, required: true },
+});
+
+const emit = defineEmits(["close"]);
+
 const formData = {
   email: "",
   firstName: "",
@@ -31,30 +61,50 @@ const formData = {
   password: "",
 };
 
+const apiUrl = "src/assets/companies.json";
+
+const close = () => {
+  emit("close");
+};
+
+const fetchUsers = async () => {
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    companies.value = data;
+  } catch (error) {
+    console.error("Error fetching list of companies:", error);
+  }
+};
+
+const companies = ref([]);
+
 const saveUser = () => {};
 
 const closeModal = () => {};
 </script>
 
-<style lang="scss">
+<style scoped>
 .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: white;
+  min-width: 40%;
+  transform: translate(-50%, -50%);
+  border: 1px solid black;
+  box-shadow: 0 0 2rem black;
 }
 
 .main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 1rem 2rem;
   background-color: white;
-  width: 50%;
-  height: 50%;
   padding: 1rem;
-  box-shadow: 0 0 2rem black;
 }
 
 .title {
@@ -69,13 +119,5 @@ const closeModal = () => {};
 .actions {
   display: flex;
   justify-content: space-between;
-}
-
-button {
-  padding: 0.5rem;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  cursor: pointer;
 }
 </style>

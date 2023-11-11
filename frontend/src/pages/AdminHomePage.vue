@@ -1,5 +1,5 @@
 <template>
-  <HeaderComponent title="Admin Home Page" />
+  <UIHeader title="Admin Home Page" />
   <main class="main" align="center">
     <router-link class="link" to="/manage-users">Manage Users</router-link>
     <router-link class="link" to="/manage-flight-schedules"
@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import UIHeader from "@/components/UIHeader.vue";
 </script>
 
 <style scoped>

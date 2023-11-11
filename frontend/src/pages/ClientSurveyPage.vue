@@ -1,11 +1,11 @@
 <template>
   <div class="container">
-    <HeaderComponent title="Client Survey" />
+    <UIHeader title="Client Survey" />
   </div>
 </template>
 
 <script setup>
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import UIHeader from "@/components/UIHeader.vue";
 </script>
 
 <style scoped></style>

@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "date": "2023-11-11",
+    "time": "10:00 AM",
+    "fromAirport": {
+      "code": "SFO",
+      "name": "San Francisco International Airport"
+    },
+    "toAirport": {
+      "code": "LAX",
+      "name": "Los Angeles International Airport"
+    },
+    "flightNumber": "UA1234",
+    "aircraft": "Boeing 737",
+    "economyClassPrice": 199,
+    "businessClassPrice": 399,
+    "firstClassPrice": 799
+  },
+  {
+    "id": 2,
+    "date": "2023-11-12",
+    "time": "12:00 PM",
+    "fromAirport": {
+      "code": "LAX",
+      "name": "Los Angeles International Airport"
+    },
+    "toAirport": {
+      "code": "SFO",
+      "name": "San Francisco International Airport"
+    },
+    "flightNumber": "AA5678",
+    "aircraft": "Airbus A320",
+    "economyClassPrice": 179,
+    "businessClassPrice": 379,
+    "firstClassPrice": 699
+  },
+  {
+    "id": 3,
+    "date": "2023-11-13",
+    "time": "02:00 PM",
+    "fromAirport": {
+      "code": "SFO",
+      "name": "San Francisco International Airport"
+    },
+    "toAirport": {
+      "code": "JFK",
+      "name": "John F. Kennedy International Airport"
+    },
+    "flightNumber": "DL9876",
+    "aircraft": "Boeing 747",
+    "economyClassPrice": 299,
+    "businessClassPrice": 499,
+    "firstClassPrice": 999
+  }
+]

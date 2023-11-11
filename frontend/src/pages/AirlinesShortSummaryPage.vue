@@ -1,11 +1,11 @@
 <template>
   <div class="container">
-    <HeaderComponent title="Airlines Short Summary Page" />
+    <UIHeader title="Airlines Short Summary Page" />
   </div>
 </template>
 
 <script setup>
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import UIHeader from "@/components/UIHeader.vue";
 </script>
 
 <style scoped></style>

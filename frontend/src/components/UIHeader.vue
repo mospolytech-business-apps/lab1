@@ -50,16 +50,4 @@ const props = defineProps({
 .exit-btn:hover {
   cursor: pointer;
 }
-
-.modal {
-  width: 300px;
-  padding: 16px;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
 </style>

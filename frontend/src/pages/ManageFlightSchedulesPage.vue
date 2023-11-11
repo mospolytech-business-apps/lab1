@@ -1,193 +1,285 @@
 <template>
-  <main>
-    <HeaderComponent title="Manage Flight Schedules" />
-    <section class="filter-bar">
-      <select v-model="filter.from">
-        <option value="">From</option>
-        <option v-for="airport in airports" :value="airport.code">
-          {{ airport.name }}
-        </option>
-      </select>
-      <select v-model="filter.to">
-        <option value="">To</option>
-        <option v-for="airport in airports" :value="airport.code">
-          {{ airport.name }}
-        </option>
-      </select>
-      <select v-model="filter.sortBy">
-        <option value="date_time">Date-Time</option>
-        <option value="outbound">Outbound</option>
-        <option value="flight_number">Flight Number</option>
-      </select>
-      <input
-        type="text"
-        v-model="filter.date"
-        placeholder="Date (dd/mm/yyyy)"
-      />
-      <input
-        type="text"
-        v-model="filter.flightNumber"
-        placeholder="Flight Number"
-      />
-      <button @click="applyFilter">Apply</button>
-    </section>
-    <section class="flight-list">
-      <table>
-        <thead>
+  <UIHeader title="Manage Flight Schedules" />
+  <main class="main">
+    <fieldset class="filters">
+      <legend>Filter by</legend>
+      <label class="field">
+        <span class="label">From</span>
+        <div class="select-wrapper">
+          <select class="select" required>
+            <option value="" disabled selected>[ Airport list ]</option>
+            <option value="SFO">San Francisco International</option>
+            <option value="LAX">Los Angeles International</option>
+            <option value="JFK">John F. Kennedy International</option>
+          </select>
+        </div>
+      </label>
+      <label class="field">
+        <span class="label">Outbound</span>
+        <input class="input" type="date" />
+      </label>
+      <label class="field">
+        <span class="label">To</span>
+        <div class="select-wrapper">
+          <select class="select" required>
+            <option value="" disabled selected>[ Airport list ]</option>
+            <option value="SFO">San Francisco International</option>
+            <option value="LAX">Los Angeles International</option>
+            <option value="JFK">John F. Kennedy International</option>
+          </select>
+        </div>
+      </label>
+      <label class="field">
+        <span class="label">Flight Number</span>
+        <input class="input" type="text" placeholder="[ XX0000 ]" />
+      </label>
+      <label class="field">
+        <span class="label">Sort by</span>
+        <div class="select-wrapper">
+          <select class="select">
+            <option value="">Date-Time</option>
+            <option value="">Economy Class Prices</option>
+            <option value="">Approved</option>
+          </select>
+        </div>
+      </label>
+      <UIButton class="apply-button">Apply</UIButton>
+    </fieldset>
+    <div class="table-wrapper">
+      <table class="table">
+        <thead class="thead">
           <tr>
             <th>Date</th>
             <th>Time</th>
             <th>From</th>
             <th>To</th>
-            <th>Flight Number</th>
+            <th>Flight number</th>
             <th>Aircraft</th>
-            <th>Economy Price</th>
-            <th>Business Price</th>
-            <th>First Class Price</th>
-            <th>Actions</th>
+            <th>Economy price</th>
+            <th>Business price</th>
+            <th>First class price</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="flight in filteredFlights" :key="flight.id">
+          <tr
+            v-for="flight in flights"
+            :key="flight.id"
+            @click="selectFlight(flight)"
+            :class="{
+              selected: flight === selectedFlight,
+              canceled: flight.status === 'canceled',
+              row: true,
+            }"
+          >
             <td>{{ flight.date }}</td>
             <td>{{ flight.time }}</td>
-            <td>{{ flight.fromAirport.name }}</td>
-            <td>{{ flight.toAirport.name }}</td>
+            <td>{{ flight.fromAirport.code }}</td>
+            <td>{{ flight.toAirport.code }}</td>
             <td>{{ flight.flightNumber }}</td>
             <td>{{ flight.aircraft }}</td>
-            <td>{{ flight.economyPrice }}</td>
-            <td>{{ flight.businessPrice }}</td>
+            <td>{{ flight.economyClassPrice }}</td>
+            <td>{{ flight.businessClassPrice }}</td>
             <td>{{ flight.firstClassPrice }}</td>
-            <td>
-              <button @click="editFlight(flight)">Edit</button>
-              <button @click="cancelFlight(flight)">Cancel</button>
-            </td>
           </tr>
         </tbody>
       </table>
-    </section>
-    <div class="import-changes">
-      <button @click="importChanges">Import Changes</button>
+    </div>
+    <div class="buttons">
+      <UIButton @click="cancelFlight(selectedFlight)">
+        <img
+          src="https://bayrivercolleges.ca/files/logo-x-twitter.svg"
+          alt="Cross icon"
+          width="25"
+          style="padding: 2px; border: 1px solid black"
+        />
+        <span>Cancel Flight</span>
+      </UIButton>
+      <UIButton @click="openEditFlightScheduleModal">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/7398/7398464.png"
+          width="25"
+          alt="Edit Icon"
+        />
+        <span>Edit Flight</span>
+      </UIButton>
+      <UIButton class="import-changes" @click="openApplyScheduleChangesModal">
+        <img
+          src="https://cdn.icon-icons.com/icons2/1122/PNG/512/downloaddownarrowsymbolinsquarebutton_79508.png"
+          width="25"
+          alt="Import Icon"
+        />
+        <span>Import Changes</span>
+      </UIButton>
     </div>
   </main>
+  <ScheduleEditModal
+    :open="isScheduleEditModalOpen"
+    @close="closeEditFlightScheduleModal"
+  />
+  <ApplyScheduleChangesModal
+    :open="isApplyScheduleChangesModalOpen"
+    @close="closeApplyScheduleChangesModal"
+  />
 </template>
 
-<script>
-import { defineComponent } from "vue";
-import HeaderComponent from "@/components/HeaderComponent.vue";
+<script setup>
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import ScheduleEditModal from "@/components/ScheduleEditModal.vue";
+import ApplyScheduleChangesModal from "@/components/ApplyScheduleChangesModal.vue";
+import { ref } from "vue";
 
-export default defineComponent({
-  name: "ManageFlightSchedules",
-  data() {
-    return {
-      airports: [],
-      flights: [],
-      filteredFlights: [],
-      filter: {
-        from: "",
-        to: "",
-        sortBy: "date_time",
-        date: "",
-        flightNumber: "",
-      },
-    };
-  },
-  mounted() {
-    // Fetch airports and flights data
-    fetch("/api/airports")
-      .then((response) => response.json())
-      .then((airports) => (this.airports = airports));
+const isApplyScheduleChangesModalOpen = ref(false);
+const isScheduleEditModalOpen = ref(false);
+const selectedFlight = ref(null);
+const editingFlightSchedule = ref(null);
 
-    fetch("/api/flights")
-      .then((response) => response.json())
-      .then((flights) => (this.flights = flights));
-  },
-  methods: {
-    applyFilter() {
-      this.filteredFlights = this.flights.filter((flight) => {
-        return (
-          (this.filter.from === "" ||
-            flight.fromAirport.code === this.filter.from) &&
-          (this.filter.to === "" || flight.toAirport.code === this.filter.to) &&
-          (this.filter.date === "" || flight.date === this.filter.date) &&
-          (this.filter.flightNumber === "" ||
-            flight.flightNumber.includes(this.filter.flightNumber))
-        );
-      });
-    },
-    editFlight(flight) {
-      // Open edit flight modal
-    },
-    cancelFlight(flight) {
-      // Cancel flight
-    },
-    importChanges() {
-      // Save changes to flights
-    },
-  },
+const airports = ref([]);
+const flights = ref([]);
+const filteredFlights = ref([]);
+
+const filter = ref({
+  from: "",
+  to: "",
+  sortBy: "date_time",
+  date: "",
+  flightNumber: "",
 });
+
+const apiUrl = "src/assets/flights.json";
+const fetchFlights = async () => {
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    flights.value = data;
+  } catch (error) {
+    console.error("Error fetching flights:", error);
+  }
+};
+
+const users = ref([]);
+
+const selectFlight = (flight) => {
+  selectedFlight.value = flight;
+};
+
+function applyFilter() {
+  filteredFlights.value = flights.value.filter((flight) => {
+    return (
+      (filter.value.from === "" ||
+        flight.fromAirport.code === filter.value.from) &&
+      (filter.value.to === "" || flight.toAirport.code === filter.value.to) &&
+      (filter.value.date === "" || flight.date === filter.value.date) &&
+      (filter.value.flightNumber === "" ||
+        flight.flightNumber.includes(filter.value.flightNumber))
+    );
+  });
+}
+
+const cancelFlight = (flight) => {
+  // TODO: Implement flight canceling
+};
+
+const openEditFlightScheduleModal = () => {
+  isScheduleEditModalOpen.value = true;
+};
+
+const closeEditFlightScheduleModal = () => {
+  isScheduleEditModalOpen.value = false;
+};
+
+const editFlightSchedule = (selectedFlight) => {
+  editingFlightSchedule.value = selectedFlight;
+  openEditFlightScheduleModal();
+};
+
+const openApplyScheduleChangesModal = () => {
+  isApplyScheduleChangesModalOpen.value = true;
+};
+
+const closeApplyScheduleChangesModal = () => {
+  isApplyScheduleChangesModalOpen.value = false;
+};
+
+fetchFlights();
 </script>
 
 <style scoped>
+.main {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 1.8rem);
+  padding: 1rem;
+  gap: 1rem;
+}
 .manage-flight-schedules {
   width: 100%;
   margin: 0 auto;
 }
 
-.filter-bar {
+.filters {
+  columns: 3;
+  column-gap: 2rem;
+  margin-bottom: 1rem;
+}
+.field {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
+  gap: 1rem;
 }
 
-.filter-bar select {
-  width: 150px;
-  margin-right: 10px;
+.input {
+  flex-grow: 1;
 }
 
-.filter-bar input {
-  width: 200px;
-  margin-right: 10px;
-}
-
-.filter-bar button {
-  background-color: #000;
-  color: #fff;
-  padding: 10px;
-  border: none;
+.select-wrapper {
+  padding: 0.25rem 0.5rem 0.25rem 0rem;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: white;
   cursor: pointer;
+  flex-grow: 1;
+}
+.select {
+  text-align-last: center;
+  padding-inline-end: 2rem;
+  outline: none;
+  border: none;
 }
 
-.flight-list {
-  width: 100%;
-  overflow-x: auto;
+.apply-button {
+  margin-left: auto;
 }
 
-.flight-list table {
-  border-collapse: collapse;
-  width: 100%;
+.table-wrapper {
+  flex-grow: 1;
+  border: 2px solid black;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
-.flight-list th,
-.flight-list td {
-  border: 1px solid #ccc;
-  padding: 10px;
+.table {
+  border: 0;
 }
 
-.flight-list th {
-  background-color: #eee;
+.buttons {
+  display: flex;
+  gap: 1rem;
 }
 
+.thead {
+  background-color: lightgray;
+  position: sticky;
+  top: 0;
+  box-shadow: 1px 1px 1px 1px black;
+}
 .import-changes {
-  text-align: right;
-  margin-top: 20px;
+  margin-left: auto;
 }
 
-.import-changes button {
-  background-color: #000;
-  color: #fff;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
+.selected {
+  box-shadow: inset 0 0 0 2px black;
 }
 </style>

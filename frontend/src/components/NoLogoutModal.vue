@@ -1,9 +1,9 @@
 <template>
   <div class="modal" v-if="open" ref="modal">
-    <HeaderComponent :title="props.title" :closeButtonHandler="close" />
+    <UIHeader :title="props.title" :closeButtonHandler="close" />
     <main class="main">
       <h1 class="title">
-        No logout detected on your last login on {{ lastLogin }}
+        No logout detected on your last login on 06/06/2021 at 12:00
       </h1>
       <p>Reason:</p>
       <textarea
@@ -14,12 +14,12 @@
       />
       <div class="bottom-row">
         <label class="label">
+          <input type="radio" name="reason" />
           <span class="reason">Software crash</span>
-          <input type="radio" name="" id="" />
         </label>
         <label class="label">
+          <input type="radio" name="reason" />
           <span class="reason">System crash</span>
-          <input type="radio" name="" />
         </label>
         <button class="btn" @click="submitForm">Confirm</button>
       </div>
@@ -30,7 +30,7 @@
 <script setup>
 import { defineProps, defineEmits, ref, onMounted } from "vue";
 import { useLogoutStore } from "@/stores/logout";
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import UIHeader from "@/components/UIHeader.vue";
 
 const props = defineProps({
   open: { type: Boolean, required: true, default: true },
@@ -74,7 +74,7 @@ async function submitForm() {
   top: 50%;
   left: 50%;
   background-color: white;
-  min-width: 40%;
+  min-width: 45%;
   transform: translate(-50%, -50%);
   border: 1px solid black;
   box-shadow: 0 0 2rem black;
@@ -91,10 +91,12 @@ async function submitForm() {
   flex-grow: 1;
   min-height: 16ch;
   margin-bottom: 1rem;
+  resize: none;
 }
 
 .title {
   font-size: 1em;
+  font-weight: 400;
 }
 
 .bottom-row {

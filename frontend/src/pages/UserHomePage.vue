@@ -1,5 +1,5 @@
 <template>
-  <HeaderComponent title="User Home Page" />
+  <UIHeader title="User Home Page" />
 
   <main class="container">
     <h1>Hi <b>user</b>, Welcome to ANOMIC AIRLINES</h1>
@@ -34,6 +34,11 @@
         </tbody>
       </table>
     </div>
+    <div class="links">
+      <router-link class="link" to="/purchase-amenities"
+        >Purchase Amenities</router-link
+      >
+    </div>
   </main>
   <NoLogoutModal
     :open="isNoLogoutModalOpen"
@@ -44,7 +49,7 @@
 
 <script setup>
 import { ref } from "vue";
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import UIHeader from "@/components/UIHeader.vue";
 import NoLogoutModal from "../components/NoLogoutModal.vue";
 import { useLogoutStore } from "@/stores/logout";
 
@@ -107,5 +112,22 @@ const isNoLogoutModalOpen = ref(true);
   display: flex;
   justify-content: end;
   gap: 3rem;
+}
+
+.links {
+  display: flex;
+}
+
+.link {
+  min-width: 25rem;
+  margin: 1rem;
+  padding: 1rem;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: black;
+  font-size: 1.5rem;
+  font-weight: bold;
+  transition: 0.3s;
 }
 </style>

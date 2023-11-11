@@ -1,6 +1,6 @@
 <template>
   <main class="main">
-    <HeaderComponent />
+    <UIHeader />
     <form class="form" @submit.prevent="onSubmit">
       <img width="500" class="logo" src="@/assets/logo.png" alt="Amonic" />
       <label class="label">
@@ -23,7 +23,7 @@
 import { ref } from "vue";
 import router from "../router";
 import { useUserRoleStore } from "@/stores/userRole.js";
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import UIHeader from "@/components/UIHeader.vue";
 
 const userRoleStore = useUserRoleStore();
 const username = ref("");
