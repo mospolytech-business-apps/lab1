@@ -1,138 +1,72 @@
 <template>
-  <div class="booking-confirmation">
-    <div class="header">
-      <h1>Booking Confirmation</h1>
-    </div>
-
-    <div class="main">
-      <div class="outbound-flight">
-        <h3>Outbound Flight</h3>
-        <table>
-          <tr>
-            <th>Flight Number</th>
-            <td>{{ outboundFlight.flightNumber }}</td>
-          </tr>
-          <tr>
-            <th>Departure Airport</th>
-            <td>{{ outboundFlight.departureAirport }}</td>
-          </tr>
-          <tr>
-            <th>Arrival Airport</th>
-            <td>{{ outboundFlight.arrivalAirport }}</td>
-          </tr>
-          <tr>
-            <th>Departure Date</th>
-            <td>{{ outboundFlight.departureDate }}</td>
-          </tr>
-          <tr>
-            <th>Departure Time</th>
-            <td>{{ outboundFlight.departureTime }}</td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="return-flight">
-        <h3>Return Flight</h3>
-        <table>
-          <tr>
-            <th>Flight Number</th>
-            <td>{{ returnFlight.flightNumber }}</td>
-          </tr>
-          <tr>
-            <th>Departure Airport</th>
-            <td>{{ returnFlight.departureAirport }}</td>
-          </tr>
-          <tr>
-            <th>Arrival Airport</th>
-            <td>{{ returnFlight.arrivalAirport }}</td>
-          </tr>
-          <tr>
-            <th>Departure Date</th>
-            <td>{{ returnFlight.departureDate }}</td>
-          </tr>
-          <tr>
-            <th>Departure Time</th>
-            <td>{{ returnFlight.departureTime }}</td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="passenger-details">
-        <h3>Passenger Details</h3>
-        <ul>
-          <li>Name: {{ passenger.firstName }} {{ passenger.lastName }}</li>
-          <li>Email: {{ passenger.email }}</li>
-          <li>Phone: {{ passenger.phone }}</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer">
-      <button type="button" @click="closeBookingConfirmation()">Close</button>
-    </div>
+  <div v-if="props.open" class="modal">
+    <UIHeader title="Add User" :closeButtonHandler="close" />
+    <main class="main"></main>
   </div>
 </template>
 
 <script setup>
-import { defineComponent } from "vue";
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import { ref } from "vue";
 
-const BookingConfirmation = defineComponent({
-  props: {
-    outboundFlight: {
-      type: Object,
-      required: true,
-    },
-    returnFlight: {
-      type: Object,
-      required: true,
-    },
-    passenger: {
-      type: Object,
-      required: true,
-    },
-  },
-  methods: {
-    closeBookingConfirmation() {
-      this.$emit("close");
-    },
-  },
+const props = defineProps({
+  open: { type: Boolean, required: true },
 });
+
+const emit = defineEmits(["close"]);
+
+const apiUrl = "src/assets/confirmation.json";
+
+const close = () => {
+  emit("close");
+};
+
+// const fetchUsers = async () => {
+//   try {
+//     const response = await fetch(apiUrl);
+//     const data = await response.json();
+//     companies.value = data;
+//   } catch (error) {
+//     console.error("Error fetching list of companies:", error);
+//   }
+// };
 </script>
 
-<style scoped lang="scss">
-.booking-confirmation {
-  width: 500px;
-  margin: 0 auto;
-  padding: 15px;
-}
-
-.header {
-  text-align: center;
+<style scoped>
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: white;
+  min-width: 40%;
+  transform: translate(-50%, -50%);
+  border: 1px solid black;
+  box-shadow: 0 0 2rem black;
 }
 
 .main {
-  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 1rem 2rem;
+  background-color: white;
+  padding: 1rem;
 }
 
-table,
-th,
-td {
-  border: 1px solid black;
-  border-collapse: collapse;
-  padding: 5px;
+.title {
+  margin-bottom: 1rem;
 }
 
-th {
-  background-color: #ccc;
+.input {
+  width: 100%;
+  margin-bottom: 0.5rem;
 }
 
-.passenger-details {
-  margin-top: 15px;
-  list-style-type: none;
-}
-
-.footer {
-  text-align: right;
-  margin-top: 15px;
+.actions {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

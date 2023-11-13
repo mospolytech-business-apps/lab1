@@ -97,22 +97,6 @@ function applyFilter() {
   flex-grow: 1;
 }
 
-.select-wrapper {
-  padding: 0.25rem 0.5rem 0.25rem 0rem;
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: white;
-  cursor: pointer;
-  flex-grow: 1;
-}
-.select {
-  text-align-last: center;
-  width: 100%;
-  padding-inline-end: 2rem;
-  outline: none;
-  border: none;
-}
-
 .table-wrapper {
   flex-grow: 1;
   border: 2px solid black;

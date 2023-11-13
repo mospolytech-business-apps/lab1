@@ -45,6 +45,9 @@
       <router-link class="link" to="/purchase-amenities"
         >Purchase Amenities</router-link
       >
+      <router-link class="link" to="/search-flights"
+        >Search For Flights</router-link
+      >
     </div>
   </main>
   <NoLogoutModal

@@ -83,12 +83,7 @@ const accessList = {
     "/amenities-report",
     "/airlines-short-summary",
   ],
-  user: [
-    "/",
-    "/search-flight-schedules",
-    "/purchase-amenities",
-    "/client-survey",
-  ],
+  user: ["/", "/search-flights", "/purchase-amenities", "/client-survey"],
 };
 
 router.beforeEach((to, from, next) => {

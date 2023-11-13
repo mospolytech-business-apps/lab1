@@ -2,36 +2,53 @@
   <div v-if="props.open" class="modal">
     <UIHeader title="Add User" :closeButtonHandler="close" />
     <main class="main">
+      <label class="label" for="email">Email address </label>
+      <input class="field" type="email" v-model="formData.email" id="email" />
+
+      <label class="label" for="firstName">First name </label>
       <input
-        type="email"
-        v-model="formData.email"
-        placeholder="Email address"
-      />
-      <input
+        class="field"
         type="text"
         v-model="formData.firstName"
-        placeholder="First name"
+        id="firstName"
       />
-      <input type="text" v-model="formData.lastName" placeholder="Last name" />
+
+      <label class="label" for="lastName">Last name </label>
       <input
+        class="field"
         type="text"
-        v-model="formData.officeName"
-        placeholder="Office name"
+        v-model="formData.lastName"
+        id="lastName"
       />
-      <select name="officeName" id="">
-        <option v-for="company in companies" :value="company.name">
-          {{ company.name }}
+
+      <label class="label" for="officeName">Office</label>
+      <UISelect
+        class="field"
+        placeholder="Office name"
+        placeholderBlue
+        placeholderUnderline
+        name="officeName"
+      >
+        <option v-for="company in companies" :value="company">
+          {{ company }}
         </option>
-      </select>
+      </UISelect>
+
+      <label class="label" for="birthDate">Birthdate</label>
       <input
+        class="field"
         type="date"
         v-model="formData.birthDate"
         placeholder="Birthdate [dd/mm/yy]"
+        id="birthDate"
       />
+
+      <label class="label" for="password">Password</label>
       <input
+        class="field"
         type="password"
         v-model="formData.password"
-        placeholder="Password"
+        id="password"
       />
       <div class="actions">
         <UIButton @click="saveUser">Save</UIButton>
@@ -44,7 +61,8 @@
 <script setup>
 import UIHeader from "@/components/UIHeader.vue";
 import UIButton from "@/components/UIButton.vue";
-import { ref, defineProps, defineEmits } from "vue";
+import UISelect from "@/components/UISelect.vue";
+import { ref } from "vue";
 
 const props = defineProps({
   open: { type: Boolean, required: true },
@@ -77,7 +95,7 @@ const fetchUsers = async () => {
   }
 };
 
-const companies = ref([]);
+const companies = ["Apple", "Google", "Microsoft", "Facebook"];
 
 const saveUser = () => {};
 
@@ -97,27 +115,41 @@ const closeModal = () => {};
 }
 
 .main {
-  display: flex;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: repeat(6, 1fr);
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
   width: 100%;
-  padding: 1rem 2rem;
+  padding: 1.5rem 4rem;
   background-color: white;
-  padding: 1rem;
 }
 
 .title {
-  margin-bottom: 1rem;
+  display: block;
+  min-height: 1rem;
+  margin-bottom: 0.25rem;
 }
 
-.input {
-  width: 100%;
-  margin-bottom: 0.5rem;
+.label {
+  display: block;
+  min-height: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.field {
+  display: block;
+  margin-bottom: 0.25rem;
 }
 
 .actions {
+  grid-row: -1;
+  grid-column: 1 / -1;
+  margin-top: 3rem;
+  padding-inline: 1.5rem;
   display: flex;
-  justify-content: space-between;
+  gap: 4rem;
+  justify-content: center;
 }
 </style>
