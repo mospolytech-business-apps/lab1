@@ -1,11 +1,11 @@
 from django.db import models
 
 class Aircraft(models.Model):
-    name = models.CharField(max_length=255)
-    make_model = models.CharField(max_length=255)
-    total_seats = models.PositiveIntegerField()
-    economy_seats = models.PositiveIntegerField()
-    business_seats = models.PositiveIntegerField()
+    Name = models.CharField(max_length=255)
+    MakeModel = models.CharField(max_length=255)
+    TotalSeats = models.PositiveIntegerField()
+    EconomySeats = models.PositiveIntegerField()
+    BusinessSeats = models.PositiveIntegerField()
 
     def __str__(self):
-        return self.name
+        return self.Name

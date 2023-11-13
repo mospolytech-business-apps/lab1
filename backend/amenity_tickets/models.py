@@ -3,8 +3,9 @@ from amenities.models import Amenity
 from tickets.models import Ticket 
 
 class AmenityTicket(models.Model):
-    amenity = models.ForeignKey(Amenity, on_delete=models.CASCADE)
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    AmenityID = models.ForeignKey(Amenity, on_delete=models.CASCADE)
+    TicketID = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    Price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.amenity} - {self.ticket}"
+        return f"{self.AmenityID} - {self.TicketID}"
