@@ -30,7 +30,7 @@ class  UserViewset(ModelViewSet):
             raise ValidationError({'error': 'password must not be empty'})
 
         try:
-            user = User.objects.get(email=request.data['Email'])
+            user = User.objects.get(Email=request.data['Email'])
         except User.DoesNotExist:
             raise NotFound({'error': 'user with this email was not found'})
 
@@ -56,22 +56,27 @@ class  UserViewset(ModelViewSet):
          users = User.objects.all()
          serializer = self.serializer_class(users, many=True)
          return Response(serializer.data)
+    
+    @action(methods=['PUT'], detail=True, url_path="ban-users")
+    def ban_user(self, request, pk=None):
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            raise NotFound({'error': 'Пользователь не найден'})
 
-    @action(methods=['POST'],detail=True,permission_classes=[IsAdminUser], url_path="ban-users")
-    def ban(self, request, pk=None):
-        user = self.get_object()
+        # Установите поле is_banned в True
         user.is_banned = True
         user.save()
-        return Response({'message': 'Пользователь забанен'})
+        return Response({'message': 'Статус блокировки пользователя успешно обновлен'})
 
-    @action(methods=['POST'],detail=True,permission_classes=[IsAdminUser], url_path="unban-users")
+    @action(methods=['POST'], detail=True, permission_classes=[IsAdminUser], url_path="unban-users")
     def unban(self, request, pk=None):
         user = self.get_object()
         user.is_banned = False
         user.save()
         return Response({'message': 'Пользователь разбанен'})
-    
-    @action(methods=['POST'], detail=True, permission_classes=[IsAdminUser], url_path="grant-admin-status")
+
+    @action(methods=['PUT'], detail=True, permission_classes=[IsAdminUser], url_path="grant-admin-status")
     def grant_admin_status(self, request, pk=None):
         user = self.get_object()
         user.is_staff = True
@@ -79,13 +84,14 @@ class  UserViewset(ModelViewSet):
         user.save()
         return Response({'message': 'Статус админа присвоен'})
 
-    @action(methods=['POST'], detail=True, permission_classes=[IsAdminUser], url_path="revoke-admin-status")
+    @action(methods=['PUT'], detail=True, permission_classes=[IsAdminUser], url_path="revoke-admin-status")
     def revoke_admin_status(self, request, pk=None):
         user = self.get_object()
         user.is_staff = False
         user.is_superuser = False
         user.save()
         return Response({'message': 'Статус админа снят'})
+
 
         
 
