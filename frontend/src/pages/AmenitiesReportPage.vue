@@ -56,7 +56,7 @@ import { computed, ref } from "vue";
 
 const report = ref({});
 
-const apiUrl = "src/assets/report.json";
+const apiUrl = "src/data/report.json";
 const fetchReport = async () => {
   try {
     const response = await fetch(apiUrl);

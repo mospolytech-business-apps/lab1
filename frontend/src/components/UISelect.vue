@@ -6,6 +6,7 @@
         placeholderBlue: props.placeholder && props.placeholderBlue,
         placeholder: true,
       }"
+      v-bind="$attrs"
       placeholder="Select an option"
       class="select"
       id="select"
@@ -26,7 +27,7 @@ const props = defineProps({
 });
 </script>
 
-<style>
+<style scoped>
 .select {
   appearance: none;
   -webkit-appearance: none;
@@ -38,6 +39,7 @@ const props = defineProps({
   border-radius: 0.15rem;
   color: #000;
   cursor: pointer;
+  padding-inline-end: 30px;
 }
 
 .select-wrapper {
@@ -59,16 +61,8 @@ const props = defineProps({
   border-left: 1px solid #757575;
 }
 
-.select-wrapper::before {
-  content: "";
-  position: absolute;
-  display: block;
-  width: 20px;
-}
-
 .placeholder {
-  color: blue;
-  padding-left: 0;
+  padding-left: 0.25rem;
 }
 
 .placeholderBlue {

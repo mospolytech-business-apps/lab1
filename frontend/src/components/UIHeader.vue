@@ -2,11 +2,7 @@
   <header class="header">
     <h1 class="title">{{ props.title }}</h1>
     <button @click="closeButtonHandler" class="exit-btn">
-      <img
-        width="20"
-        src="https://cdn2.iconfinder.com/data/icons/general-ui-icons/800/delete85-1024.png"
-        alt="Exit button"
-      />
+      <img width="20" src="@/assets/cross-icon.png" alt="Exit button" />
     </button>
   </header>
 </template>

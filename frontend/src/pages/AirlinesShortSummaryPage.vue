@@ -1,8 +1,6 @@
 <template>
   <UIHeader title="Airlines Short Summary" />
-  <UINav>
-    <button @click="$router.push('/')">Exit</button>
-  </UINav>
+  <UINav />
 
   <img width="400" class="logo" src="@/assets/logo.png" alt="Amonic" />
   <main class="main">
@@ -52,11 +50,7 @@
     <div class="bottom">
       <p>Report generated in [XX] seconds</p>
       <UIButton class="make-report" @click="$router.push('/')">
-        <img
-          src="https://cdn2.iconfinder.com/data/icons/general-ui-icons/800/delete85-1024.png"
-          width="25"
-          alt="Close icon"
-        />
+        <img src="@/assets/cross-icon.png" width="25" alt="Close icon" />
         Close
       </UIButton>
     </div>

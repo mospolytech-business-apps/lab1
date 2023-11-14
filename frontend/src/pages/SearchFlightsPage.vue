@@ -1,72 +1,82 @@
 <template>
   <UIHeader title="Search for flights" />
-  <UINav class="menu">
-    <button @click="$router.push('/')">Exit</button>
-  </UINav>
+  <UINav class="menu" />
   <main class="main">
-    <fieldset class="filters">
+    <fieldset>
       <legend>Search Parameters</legend>
       <label class="field">
         <span class="label">From</span>
-        <div class="select-wrapper">
-          <select class="select" required>
-            <option value="" disabled selected>[ Airport list ]</option>
-            <option value="SFO">San Francisco International</option>
-            <option value="LAX">Los Angeles International</option>
-            <option value="JFK">John F. Kennedy International</option>
-          </select>
-        </div>
+        <UISelect placeholder="[ Airport list ]" required>
+          <option value="SFO">San Francisco International</option>
+          <option value="LAX">Los Angeles International</option>
+          <option value="JFK">John F. Kennedy International</option>
+        </UISelect>
       </label>
       <label class="field">
         <span class="label">To</span>
-        <div class="select-wrapper">
-          <select class="select" required>
-            <option value="" disabled selected>[ Airport list ]</option>
-            <option value="SFO">San Francisco International</option>
-            <option value="LAX">Los Angeles International</option>
-            <option value="JFK">John F. Kennedy International</option>
-          </select>
-        </div>
+        <UISelect placeholder="[ Airport list ]" required>
+          <option value="SFO">San Francisco International</option>
+          <option value="LAX">Los Angeles International</option>
+          <option value="JFK">John F. Kennedy International</option>
+        </UISelect>
       </label>
       <label class="field">
         <span class="label">Cabin Type</span>
-        <div class="select-wrapper">
-          <select class="select" required>
-            <option value="" disabled selected>[ Cabin Type ]</option>
-            <option value="Economy">San Francisco International</option>
-            <option value="Business">Los Angeles International</option>
-            <option value="First Class">John F. Kennedy International</option>
-          </select>
-        </div>
+        <UISelect placeholder="[ Cabin Type ]" required>
+          <option value="Economy">San Francisco International</option>
+          <option value="Business">Los Angeles International</option>
+          <option value="First Class">John F. Kennedy International</option>
+        </UISelect>
       </label>
-      <label class="field">
-        <span class="label">Return</span>
-        <input class="radio" type="radio" name="returnType" />
-      </label>
-      <label class="field">
-        <span class="label">On way</span>
-        <input class="radio" type="radio" name="returnType" />
-      </label>
+      <br />
+      <div class="return-type">
+        <label class="radio">
+          <span class="label">Return</span>
+          <input class="radio" type="radio" name="returnType" />
+        </label>
+        <label class="radio">
+          <span class="label">On way</span>
+          <input class="radio" type="radio" name="returnType" />
+        </label>
+      </div>
       <label class="field">
         <span class="label">
-          <img src="" alt="Onboard icon" />
+          <img
+            src="@/assets/onboarding-icon.png"
+            width="20"
+            height="20"
+            alt="Onboard icon"
+          />
           Onboard
         </span>
-        <input class="input" type="text" />
+        <input type="date" />
       </label>
       <label class="field">
         <span class="label">
-          <img src="" alt="Return icon" />
+          <img
+            src="@/assets/returning-icon.png"
+            alt="Return icon"
+            width="20"
+            height="20"
+          />
           Return
         </span>
-        <input class="input" type="text" />
+        <input type="date" />
       </label>
-      <UIButton @click="applyFilters" class="apply-button">Apply</UIButton>
+      <UIButton @click="applyFilters" class="apply-button">
+        <img
+          src="https://static.thenounproject.com/png/875351-200.png"
+          width="20"
+          height="20"
+          alt="Search icon"
+        />
+        <span>Apply</span>
+      </UIButton>
     </fieldset>
     <div class="outbounding">
       <div class="table-heading">
         <p>Outbounding flight details:</p>
-        <label class="field">
+        <label class="table-filter">
           <input class="checkbox" type="checkbox" name="filterReturning" />
           <span class="label">Display three days before and after</span>
         </label>
@@ -102,7 +112,7 @@
     <div class="returning">
       <div class="table-heading">
         <p>Return flight details:</p>
-        <label class="field">
+        <label class="table-filter">
           <input class="checkbox" type="checkbox" name="filterReturning" />
           <span class="label">Display three days before and after</span>
         </label>
@@ -134,13 +144,51 @@
         </table>
       </div>
     </div>
+    <div class="actions">
+      <fieldset class="confirm">
+        <legend>Confirm booking for</legend>
+        <label class="passengers-field">
+          <input
+            class="passenger-number-input"
+            placeholder="[XXX]"
+            type="text"
+          />
+          <span class="label">Passengers</span>
+        </label>
+        <UIButton @click="openBookingConfirmationModal">
+          <img src="@/assets/check-mark-icon.png" width="20" alt="check mark" />
+          <span>Book flight</span>
+        </UIButton>
+      </fieldset>
+      <UIButton class="actions-btn">
+        <img src="@/assets/cross-icon.png" width="20" alt="Exit button" />
+        <span>Exit</span>
+      </UIButton>
+    </div>
   </main>
+  <BookingConfirmationModal
+    :open="isBookingConfirmationModalOpen"
+    @close="closeBookingConfirmationModal"
+  />
 </template>
 
 <script setup>
 import UIHeader from "@/components/UIHeader.vue";
 import UINav from "@/components/UINav.vue";
+import UISelect from "@/components/UISelect.vue";
 import UIButton from "@/components/UIButton.vue";
+import BookingConfirmationModal from "@/components/BookingConfirmationModal.vue";
+import { ref } from "vue";
+
+const isBookingConfirmationModalOpen = ref(false);
+
+const openBookingConfirmationModal = () => {
+  isBookingConfirmationModalOpen.value = true;
+};
+
+const closeBookingConfirmationModal = () => {
+  isBookingConfirmationModalOpen.value = false;
+};
 
 const outbounding = [
   {
@@ -260,14 +308,6 @@ p {
   gap: 1rem;
 }
 
-.filters > * {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  margin-right: 5rem;
-  margin-block: 0.5rem;
-}
-
 thead {
   background-color: lightgray;
   border-bottom: 2px solid black;
@@ -297,25 +337,67 @@ th {
 .table-heading {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 0.25rem;
   align-items: center;
 }
 
-.select-wrapper {
-  padding: 0.25rem 0.5rem 0.25rem 0rem;
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: white;
-  cursor: pointer;
-  flex-grow: 1;
+.field {
+  display: inline-flex;
+  gap: 1rem;
+  margin-right: 4rem;
+  margin-block: 1rem;
+  min-height: 2.125rem;
 }
-.select {
-  text-align-last: center;
-  width: 100%;
-  padding-inline-end: 2rem;
-  outline: none;
-  border: none;
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
+
 .apply-button {
-  display: inline;
+  display: inline flex;
+}
+
+.table-filter {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.actions {
+  margin-inline: 10rem;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr 6fr 1fr;
+}
+
+.confirm {
+  grid-column: 2 / 3;
+  display: flex;
+  justify-content: space-between;
+}
+
+.passengers-field {
+  display: flex;
+  gap: 0.5rem;
+}
+.passenger-number-input {
+  width: 4rem;
+}
+
+.return-type {
+  display: inline-flex;
+  gap: 1rem;
+  margin-right: 4rem;
+}
+
+.radio {
+  display: flex;
+}
+
+.actions-btn {
+  align-self: center;
+  margin-top: 0.5rem;
+  height: 2.5rem;
 }
 </style>

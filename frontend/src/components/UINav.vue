@@ -1,8 +1,11 @@
 <template>
   <nav class="nav-menu">
     <slot></slot>
+    <button class="exit" @click="$router.push('/')">Exit</button>
   </nav>
 </template>
+
+<script setup></script>
 
 <style>
 .nav-menu {
@@ -28,5 +31,9 @@
 
 .nav-menu > *:active {
   background-color: gray;
+}
+
+.exit:hover {
+  background-color: salmon;
 }
 </style>

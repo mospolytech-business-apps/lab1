@@ -1,21 +1,17 @@
 <template>
   <UIHeader title="Manage Flight Schedules" />
-  <UINav class="menu">
-    <button @click="$router.push('/')">Exit</button>
-  </UINav>
+  <UINav />
   <main class="main">
     <fieldset class="filters">
       <legend>Filter by</legend>
       <label class="field">
         <span class="label">From</span>
-        <div class="select-wrapper">
-          <select class="select" required>
-            <option value="" disabled selected>[ Airport list ]</option>
-            <option value="SFO">San Francisco International</option>
-            <option value="LAX">Los Angeles International</option>
-            <option value="JFK">John F. Kennedy International</option>
-          </select>
-        </div>
+        <UISelect required>
+          <option value="" disabled selected>[ Airport list ]</option>
+          <option value="SFO">San Francisco International</option>
+          <option value="LAX">Los Angeles International</option>
+          <option value="JFK">John F. Kennedy International</option>
+        </UISelect>
       </label>
       <label class="field">
         <span class="label">Outbound</span>
@@ -23,14 +19,12 @@
       </label>
       <label class="field">
         <span class="label">To</span>
-        <div class="select-wrapper">
-          <select class="select" required>
-            <option value="" disabled selected>[ Airport list ]</option>
-            <option value="SFO">San Francisco International</option>
-            <option value="LAX">Los Angeles International</option>
-            <option value="JFK">John F. Kennedy International</option>
-          </select>
-        </div>
+        <UISelect required>
+          <option value="" disabled selected>[ Airport list ]</option>
+          <option value="SFO">San Francisco International</option>
+          <option value="LAX">Los Angeles International</option>
+          <option value="JFK">John F. Kennedy International</option>
+        </UISelect>
       </label>
       <label class="field">
         <span class="label">Flight Number</span>
@@ -38,13 +32,11 @@
       </label>
       <label class="field">
         <span class="label">Sort by</span>
-        <div class="select-wrapper">
-          <select class="select">
-            <option value="">Date-Time</option>
-            <option value="">Economy Class Prices</option>
-            <option value="">Approved</option>
-          </select>
-        </div>
+        <UISelect requited>
+          <option value="">Date-Time</option>
+          <option value="">Economy Class Prices</option>
+          <option value="">Approved</option>
+        </UISelect>
       </label>
       <UIButton class="apply-button">Apply</UIButton>
     </fieldset>
@@ -128,6 +120,7 @@
 <script setup>
 import UIHeader from "@/components/UIHeader.vue";
 import UIButton from "@/components/UIButton.vue";
+import UISelect from "@/components/UISelect.vue";
 import UINav from "@/components/UINav.vue";
 import ScheduleEditModal from "@/components/ScheduleEditModal.vue";
 import ApplyScheduleChangesModal from "@/components/ApplyScheduleChangesModal.vue";
@@ -150,7 +143,7 @@ const filter = ref({
   flightNumber: "",
 });
 
-const apiUrl = "src/assets/flights.json";
+const apiUrl = "src/data/flights.json";
 const fetchFlights = async () => {
   try {
     const response = await fetch(apiUrl);
@@ -235,22 +228,6 @@ fetchFlights();
 
 .input {
   flex-grow: 1;
-}
-
-.select-wrapper {
-  padding: 0.25rem 0.5rem 0.25rem 0rem;
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: white;
-  cursor: pointer;
-  flex-grow: 1;
-}
-.select {
-  text-align-last: center;
-  width: 100%;
-  padding-inline-end: 2rem;
-  outline: none;
-  border: none;
 }
 
 .apply-button {

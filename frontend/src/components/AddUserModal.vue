@@ -52,7 +52,7 @@
       />
       <div class="actions">
         <UIButton @click="saveUser">Save</UIButton>
-        <UIButton @click="close">Cancel</UIButton>
+        <UIButton class="cancel-btn" @click="close">Cancel</UIButton>
       </div>
     </main>
   </div>
@@ -79,7 +79,7 @@ const formData = {
   password: "",
 };
 
-const apiUrl = "src/assets/companies.json";
+const apiUrl = "src/data/companies.json";
 
 const close = () => {
   emit("close");
@@ -151,5 +151,9 @@ const closeModal = () => {};
   display: flex;
   gap: 4rem;
   justify-content: center;
+}
+
+.cancel-btn:hover {
+  background-color: salmon;
 }
 </style>

@@ -16,6 +16,7 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  position: relative;
 }
 .btn:hover {
   background-color: lightgray;

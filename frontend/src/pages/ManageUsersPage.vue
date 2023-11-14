@@ -2,21 +2,11 @@
   <UIHeader title="Manage Users" />
   <UINav>
     <button @click="openAddUserModal">Add user</button>
-    <button @click="$router.push('/')">Exit</button>
   </UINav>
   <main class="main">
     <div class="filter">
       <p class="filter-title">Office:</p>
-      <select
-        class="select"
-        id="company-filter"
-        style="
-          border-radius: 5px;
-          border: 1px solid black;
-          padding: 0.25rem 1rem;
-          width: 100%;
-        "
-      >
+      <UISelect class="company-filter">
         <option value="">All Offices</option>
         <option
           v-for="company in companies"
@@ -25,7 +15,7 @@
         >
           {{ company.name }}
         </option>
-      </select>
+      </UISelect>
     </div>
     <div class="table-wrapper">
       <table class="table">
@@ -83,6 +73,7 @@ import EditRoleModal from "@/components/EditRoleModal.vue";
 import UIHeader from "@/components/UIHeader.vue";
 import UINav from "@/components/UINav.vue";
 import UIButton from "@/components/UIButton.vue";
+import UISelect from "@/components/UISelect.vue";
 
 const isAddUserModalOpen = ref(false);
 const isEditRoleModalOpen = ref(false);
@@ -104,7 +95,7 @@ const closeEditRoleModal = () => {
   isEditRoleModalOpen.value = false;
 };
 
-const apiUrl = "src/assets/users.json";
+const apiUrl = "src/data/users.json";
 const fetchUsers = async () => {
   try {
     const response = await fetch(apiUrl);
@@ -161,13 +152,10 @@ fetchUsers();
   margin: 0;
 }
 
-.select {
-  border-radius: 5px;
-  border: 1px solid black;
-  height: 100%;
-  padding: 0.25rem 1rem;
-  width: 100%;
+.company-filter {
+  min-width: 10rem;
 }
+
 .selected {
   box-shadow: inset 0 0 0 2px black;
 }
@@ -190,6 +178,7 @@ thead {
 td,
 th {
   border: 1px solid black;
+  padding-inline-start: 0.25rem;
 }
 
 .table-wrapper {

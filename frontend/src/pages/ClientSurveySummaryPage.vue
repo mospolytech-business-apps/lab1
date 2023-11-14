@@ -1,9 +1,8 @@
 <template>
   <UIHeader title="Flight Satisfaction Survey Reports" />
-  <UINav class="menu">
+  <UINav>
     <button>View Results Summary</button>
     <button>View Detailed Summary</button>
-    <button @click="$router.push('/')">Exit</button>
   </UINav>
   <main class="main">
     <h1 class="visually-hidden">Client Survey Summary</h1>
@@ -66,23 +65,5 @@ import UINav from "@/components/UINav.vue";
   justify-content: center;
   align-items: start;
   gap: 1rem;
-}
-
-.menu {
-  display: flex;
-  justify-content: left;
-  gap: 0.25rem;
-  min-height: 30px;
-  border-bottom: 2px solid black;
-}
-
-.menu-btn {
-  border-radius: 5px;
-  background: 0;
-  border: 0;
-  cursor: pointer;
-}
-.menu-btn::first-letter {
-  text-decoration: underline;
 }
 </style>

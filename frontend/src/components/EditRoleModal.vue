@@ -38,7 +38,7 @@
 
       <div class="actions">
         <UIButton @click="applyRoleChanges">Apply</UIButton>
-        <UIButton @click="close">Cancel</UIButton>
+        <UIButton class="cancel-btn" @click="close">Cancel</UIButton>
       </div>
     </main>
   </div>
@@ -144,5 +144,9 @@ const close = () => {
   display: flex;
   justify-content: center;
   gap: 4rem;
+}
+
+.cancel-btn:hover {
+  background-color: salmon;
 }
 </style>

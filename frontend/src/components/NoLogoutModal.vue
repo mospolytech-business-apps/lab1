@@ -21,7 +21,7 @@
           <input type="radio" name="reason" />
           <span class="reason">System crash</span>
         </label>
-        <button class="btn" @click="submitForm">Confirm</button>
+        <UIButton class="btn" @click="submitForm">Confirm</UIButton>
       </div>
     </main>
   </div>
@@ -30,6 +30,7 @@
 <script setup>
 import { useLogoutStore } from "@/stores/logout";
 import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
 
 const props = defineProps({
   open: { type: Boolean, required: true, default: true },

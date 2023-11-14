@@ -1,8 +1,6 @@
 <template>
   <UIHeader title="Purchase Amenities" />
-  <UINav class="menu">
-    <button @click="$router.push('/')">Exit</button>
-  </UINav>
+  <UINav />
   <main class="main">
     <div class="search-booking">
       <label class="field">
@@ -16,13 +14,11 @@
       <div class="flight-list">
         <label class="field">
           <span class="booking-number">Choose your flights: </span>
-          <div class="select-wrapper">
-            <select name="select-flights" class="select-flights">
-              <option value="">1107, AUH-DOH, 11/07/2017, 17:20</option>
-              <option value="">1309, XYZ-ASD, 23/02/2011, 11:30</option>
-              <option value="">2182, QWE-POI, 1/02/2018, 13:00</option>
-            </select>
-          </div>
+          <UISelect class="select-flights" name="select-flights">
+            <option value="">1107, AUH-DOH, 11/07/2017, 17:20</option>
+            <option value="">1309, XYZ-ASD, 23/02/2011, 11:30</option>
+            <option value="">2182, QWE-POI, 1/02/2018, 13:00</option>
+          </UISelect>
         </label>
         <UIButton>Show Amenities</UIButton>
       </div>
@@ -132,20 +128,6 @@ const isAmenitiesReportModalOpen = ref(false);
   padding-bottom: 0.75rem;
   padding-inline: 1rem;
   align-items: center;
-}
-
-.select-wrapper {
-  padding: 0.25rem 0.5rem 0.25rem 0rem;
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: white;
-  cursor: pointer;
-}
-.select-flights {
-  text-align-last: center;
-  padding-inline-end: 2rem;
-  outline: none;
-  border: none;
 }
 
 .amenities-list {

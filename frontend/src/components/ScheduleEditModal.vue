@@ -26,7 +26,12 @@
         <UIButton @click="update" type="button" id="saveSchedule">
           Update
         </UIButton>
-        <UIButton @click="cancel" type="button" data-dismiss="modal">
+        <UIButton
+          class="cancel-btn"
+          @click="cancel"
+          type="button"
+          data-dismiss="modal"
+        >
           Cancel
         </UIButton>
       </div>
@@ -96,5 +101,9 @@ const update = () => {
 }
 .price-input {
   max-width: 5rem;
+}
+
+.cancel-btn:hover {
+  background-color: salmon;
 }
 </style>
