@@ -63,13 +63,11 @@ class  UserViewset(ModelViewSet):
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             raise NotFound({'error': 'Пользователь не найден'})
-
-        # Установите поле is_banned в True
         user.is_banned = True
         user.save()
         return Response({'message': 'Статус блокировки пользователя успешно обновлен'})
 
-    @action(methods=['POST'], detail=True, permission_classes=[IsAdminUser], url_path="unban-users")
+    @action(methods=['PUT'], detail=True, permission_classes=[IsAdminUser], url_path="unban-users")
     def unban(self, request, pk=None):
         user = self.get_object()
         user.is_banned = False
