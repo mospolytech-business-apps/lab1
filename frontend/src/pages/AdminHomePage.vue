@@ -5,7 +5,7 @@
     <router-link class="link" to="/manage-flight-schedules"
       >Manage Flight Schedules</router-link
     >
-    <router-link class="link" to="/client-survey-summary"
+    <router-link class="link" to="/client-survey"
       >Client Survey Summary</router-link
     >
     <router-link class="link" to="/amenities-report"

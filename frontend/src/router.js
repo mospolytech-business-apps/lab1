@@ -3,7 +3,6 @@ import { useUserRoleStore } from "@/stores/userRole";
 
 import AdminHomePage from "@/pages/AdminHomePage.vue";
 import ClientSurveyPage from "@/pages/ClientSurveyPage.vue";
-import ClientSurveySummaryPage from "@/pages/ClientSurveySummaryPage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import ManageFlightSchedulesPage from "@/pages/ManageFlightSchedulesPage.vue";
 import ManageUsersPage from "@/pages/ManageUsersPage.vue";
@@ -66,11 +65,6 @@ const router = createRouter({
       name: "client-survey",
       component: ClientSurveyPage,
     },
-    {
-      path: "/client-survey-summary",
-      name: "client-survey-summary",
-      component: ClientSurveySummaryPage,
-    },
   ],
 });
 
@@ -79,7 +73,7 @@ const accessList = {
     "/",
     "/manage-users",
     "/manage-flight-schedules",
-    "/client-survey-summary",
+    "/client-survey",
     "/amenities-report",
     "/airlines-short-summary",
   ],
