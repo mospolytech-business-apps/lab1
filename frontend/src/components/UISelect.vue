@@ -1,11 +1,13 @@
 <template>
   <div class="select-wrapper">
     <select
+      @change="changeOption"
       :class="{
         placeholderUnderline: props.placeholder && props.placeholderUnderline,
         placeholderBlue: props.placeholder && props.placeholderBlue,
         placeholder: true,
       }"
+      :value="props.modelValue"
       v-bind="$attrs"
       placeholder="Select an option"
       class="select"
@@ -24,7 +26,14 @@ const props = defineProps({
   placeholder: { type: String },
   placeholderBlue: { type: Boolean },
   placeholderUnderline: { type: Boolean },
+  modelValue: { type: String },
 });
+
+const emit = defineEmits(["update:modelValue"]);
+
+const changeOption = (event) => {
+  emit("update:modelValue", event.currentTarget.value);
+};
 </script>
 
 <style scoped>

@@ -67,31 +67,46 @@
     </main>
   </template>
   <template v-else>
-    <DetailedReport />
+    <DetailedReportJSON report="report" />
   </template>
 </template>
 
 <script setup>
-import DetailedReport from "@/components/DetailedReport.vue";
+import DetailedReportJSON from "@/components/DetailedReportJSON.vue";
 import UIHeader from "@/components/UIHeader.vue";
 import UINav from "@/components/UINav.vue";
 import { ref } from "vue";
 
 const isSummaryShown = ref(true);
 
-const downloadPDF = async () => {
-  try {
-    const response = await fetch("src/data/CaseStudy.pdf", {
-      responseType: "arraybuffer",
-    });
+// const downloadPDF = async () => {
+//   try {
+//     const response = await fetch("src/data/CaseStudy.pdf", {
+//       responseType: "arraybuffer",
+//     });
 
-    const buffer = await response.arrayBuffer();
-    const blob = new Blob([buffer], { type: "application/pdf" });
-    blob.saveAs(blob, "CaseStudy.pdf");
+//     const buffer = await response.arrayBuffer();
+//     const blob = new Blob([buffer], { type: "application/pdf" });
+//     blob.saveAs(blob, "CaseStudy.pdf");
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
+const report = ref(null);
+
+const apiUrl = "src/data/summary-report.json";
+const fetchReport = async () => {
+  try {
+    const response = await fetch(apiUrl);
+    report.value = await response.json();
+    console.log(report.value);
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching report:", error);
   }
 };
+
+fetchReport();
 </script>
 
 <style scoped>
