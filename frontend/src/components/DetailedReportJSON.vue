@@ -3,7 +3,7 @@
     <h1 class="visually-hidden">Client Detailed Survey</h1>
     <label class="field">
       <span class="label">Time period: </span>
-      <UISelect @update:modelValue="flagsPeriods">
+      <UISelect>
         <option value="all">All period</option>
         <option value="july2017">July 2017</option>
         <option value="august2017">August 2017</option>
@@ -14,334 +14,104 @@
       <thead>
         <tr>
           <th class="blank"></th>
-          <th></th>
+          <th>&lrm;&#x20;</th>
           <th
             :colspan="
-              Object.keys(flags.gender).filter((k) => flags.gender[k]).length
+              Object.keys(flags.gender).filter((k) => flags.gender[k]).length -
+              1
             "
-            v-show="Object.keys(flags.gender).some((k) => flags.gender[k])"
+            v-show="
+              Object.keys(flags.gender).some((k) => flags.gender[k]) &&
+              flags.gender.__active
+            "
           >
             Gender
           </th>
           <th
-            :colspan="Object.keys(flags.age).filter((k) => flags.age[k]).length"
-            v-show="Object.keys(flags.age).some((k) => flags.age[k])"
+            :colspan="
+              Object.keys(flags.age).filter((k) => flags.age[k]).length - 1
+            "
+            v-show="
+              Object.keys(flags.age).some((k) => flags.age[k]) &&
+              flags.age.__active
+            "
           >
             Age
           </th>
-          <th colspan="3">Cabin Type</th>
-          <th colspan="5">Destination airport</th>
+          <th
+            :colspan="
+              Object.keys(flags.cabin).filter((k) => flags.cabin[k]).length - 1
+            "
+            v-show="
+              Object.keys(flags.cabin).some((k) => flags.cabin[k]) &&
+              flags.cabin.__active
+            "
+          >
+            Cabin Type
+          </th>
+          <th
+            :colspan="
+              Object.keys(flags.airport).filter((k) => flags.airport[k])
+                .length - 1
+            "
+            v-show="
+              Object.keys(flags.airport).some((k) => flags.airport[k]) &&
+              flags.airport.__active
+            "
+          >
+            Destination airport
+          </th>
         </tr>
         <tr>
           <th class="blank"></th>
           <th>Total</th>
-          <th v-show="flags.gender.male">Male</th>
-          <th v-show="flags.gender.female">Female</th>
-          <th v-show="flags.age['18-24']">18-24</th>
-          <th v-show="flags.age['25-39']">25-39</th>
-          <th v-show="flags.age['40-59']">40-59</th>
-          <th v-show="flags.age['60+']">60+</th>
-          <th>Economy</th>
-          <th>Business</th>
-          <th>First</th>
-          <th>AUH</th>
-          <th>BAH</th>
-          <th>DOH</th>
-          <th>RYU</th>
-          <th>CAI</th>
+          <th v-show="flags.gender.male && flags.gender.__active">Male</th>
+          <th v-show="flags.gender.female && flags.gender.__active">Female</th>
+          <th v-show="flags.age['18-24'] && flags.age.__active">18-24</th>
+          <th v-show="flags.age['25-39'] && flags.age.__active">25-39</th>
+          <th v-show="flags.age['40-59'] && flags.age.__active">40-59</th>
+          <th v-show="flags.age['60+'] && flags.age.__active">60+</th>
+          <th v-show="flags.cabin['economy'] && flags.cabin.__active">
+            Economy
+          </th>
+          <th v-show="flags.cabin['business'] && flags.cabin.__active">
+            Business
+          </th>
+          <th v-show="flags.cabin['first'] && flags.cabin.__active">First</th>
+          <th v-show="flags.airport['AUH'] && flags.airport.__active">AUH</th>
+          <th v-show="flags.airport['BAH'] && flags.airport.__active">BAH</th>
+          <th v-show="flags.airport['DOH'] && flags.airport.__active">DOH</th>
+          <th v-show="flags.airport['RYU'] && flags.airport.__active">RYU</th>
+          <th v-show="flags.airport['CAI'] && flags.airport.__active">CAI</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td class="meta-description">
-            Please rate our aircraft flown on AMONIC Airlines:
-          </td>
-          <td colspan="16" class="statistics">
-            <span class="meta-wrapper">
-              <div style="--dont-know: 14.2%" class="dont-know"></div>
-              <div style="--poor: 14.2%" class="poor"></div>
-              <div
-                style="--needs-improvement: 14.2%"
-                class="needs-improvement"
-              ></div>
-              <div style="--adequate: 14.2%" class="adequate"></div>
-              <div style="--good: 14.2%" class="good"></div>
-              <div style="--very-good: 14.2%" class="very-good"></div>
-              <div style="--outstanding: 14.2%" class="outstanding"></div>
-            </span>
-          </td>
-        </tr>
-        <tr>
-          <td class="meta">Outstanding</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Very good</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Good</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Adequate</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Needs improvement</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Poor</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Don't know</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta-description">
-            How would you rate our flight amenities:
-          </td>
-          <td colspan="16" class="statistics">
-            <span class="meta-wrapper">
-              <div style="--dont-know: 14.2%" class="dont-know"></div>
-              <div style="--poor: 14.2%" class="poor"></div>
-              <div
-                style="--needs-improvement: 14.2%"
-                class="needs-improvement"
-              ></div>
-              <div style="--adequate: 14.2%" class="adequate"></div>
-              <div style="--good: 14.2%" class="good"></div>
-              <div style="--very-good: 14.2%" class="very-good"></div>
-              <div style="--outstanding: 14.2%" class="outstanding"></div>
-            </span>
-          </td>
-        </tr>
-        <tr>
-          <td class="meta">Outstanding</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Very good</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Good</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Adequate</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Needs improvement</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Poor</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
-        <tr>
-          <td class="meta">Don't know</td>
-          <td class="total">888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-          <td>888</td>
-        </tr>
+        <template v-for="(q, qk, qi) of data" :key="qk">
+          <tr>
+            <td class="meta-description">
+              {{ qk }}
+            </td>
+            <td colspan="16" class="statistics">
+              <span class="meta-wrapper">
+                <div style="--dont-know: 14.2%" class="dont-know"></div>
+                <div style="--poor: 14.2%" class="poor"></div>
+                <div
+                  style="--needs-improvement: 14.2%"
+                  class="needs-improvement"
+                ></div>
+                <div style="--adequate: 14.2%" class="adequate"></div>
+                <div style="--good: 14.2%" class="good"></div>
+                <div style="--very-good: 14.2%" class="very-good"></div>
+                <div style="--outstanding: 14.2%" class="outstanding"></div>
+              </span>
+            </td>
+          </tr>
+          <tr v-for="(r, rk, i) of q" :key="rk">
+            <td class="meta">{{ rk }}</td>
+            <td class="total">{{ calculateTotalForRow(qi, i) }}</td>
+            <td v-show="isColumnShown(j)" v-for="(d, j) in r">{{ d }}</td>
+          </tr>
+        </template>
       </tbody>
     </table>
     <div class="labels">
@@ -353,17 +123,17 @@
       <p class="poor">Poor</p>
       <p class="dont-know">Don't know</p>
     </div>
-    <div class="flagss">
+    <div class="flags">
       <div class="gender">
         <label class="filed">
           <input
-            v-model="filters.gender.active"
+            v-model="flags.gender['__active']"
             class="checkbox"
             type="checkbox"
           />
           <span class="label">Gender</span>
         </label>
-        <UISelect v-model="filters.gender.value">
+        <UISelect :disabled="!flags.gender.__active" v-model="filters.gender">
           <option value="all">All genders</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
@@ -372,14 +142,13 @@
       <div class="age">
         <label class="filed">
           <input
-            v-model="filters.age.active"
-            @change="logState"
+            v-model="flags.age['__active']"
             class="checkbox"
             type="checkbox"
           />
           <span class="label">Age</span>
         </label>
-        <UISelect v-model="filters.age.value">
+        <UISelect :disabled="!flags.age.__active" v-model="filters.age">
           <option value="all">All ages</option>
           <option value="18-24">18-24</option>
           <option value="25-39">25-39</option>
@@ -389,29 +158,36 @@
       </div>
       <div class="cabin-type">
         <label class="filed">
-          <input class="checkbox" type="checkbox" />
+          <input
+            v-model="flags.cabin['__active']"
+            class="checkbox"
+            type="checkbox"
+          />
           <span class="label">Cabin Type</span>
         </label>
-        <UISelect>
-          <option value="all-types">All types</option>
-          <option value="male">Economy</option>
-          <option value="female">Business</option>
-          <option value="female">First</option>
+        <UISelect :disabled="!flags.cabin.__active" v-model="filters.cabin">
+          <option value="all">All types</option>
+          <option value="economy">Economy</option>
+          <option value="business">Business</option>
+          <option value="first">First</option>
         </UISelect>
       </div>
       <div class="dest-airport">
         <label class="filed">
-          <input class="checkbox" type="checkbox" />
+          <input
+            v-model="flags.airport['__active']"
+            class="checkbox"
+            type="checkbox"
+          />
           <span class="label">Destination Airport</span>
         </label>
-        <UISelect>
-          <option value="all-types">All airports</option>
-          <option value="male"></option>
-          <option value="female">AUH</option>
-          <option value="female">BUH</option>
-          <option value="female">DOH</option>
-          <option value="female">RYU</option>
-          <option value="female">CAI</option>
+        <UISelect :disabled="!flags.airport.__active" v-model="filters.airport">
+          <option value="all">All airports</option>
+          <option value="AUH">AUH</option>
+          <option value="BAH">BAH</option>
+          <option value="DOH">DOH</option>
+          <option value="RYU">RYU</option>
+          <option value="CAI">CAI</option>
         </UISelect>
       </div>
     </div>
@@ -420,42 +196,102 @@
 
 <script setup>
 import UISelect from "@/components/UISelect.vue";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   report: Object,
 });
 
-const flags = ref({
-  gender: { male: false, female: true },
-  age: { "18-24": false, "25-39": false, "40-59": false, "60+": true },
-});
+const data = computed(() => props.report["July 2017"]);
 
 const filters = ref({
-  gender: {
-    active: true,
-    value: "male",
+  gender: "all",
+  age: "all",
+  cabin: "all",
+  airport: "all",
+});
+
+const flags = ref({
+  gender: { __active: true, male: true, female: true },
+  age: {
+    __active: true,
+    "18-24": true,
+    "25-39": true,
+    "40-59": true,
+    "60+": true,
   },
-  age: { active: true, value: "60+" },
+  cabin: {
+    __active: true,
+    economy: true,
+    business: true,
+    first: true,
+  },
+  airport: {
+    __active: true,
+    AUH: true,
+    BAH: true,
+    DOH: true,
+    RYU: true,
+    CAI: true,
+  },
 });
 
 const updateFlags = (filterChanges) => {
-  Object.keys(filterChanges).foreach((category) => {
+  const enableAllFlagsForCategory = (flags, category) => {
+    Object.keys(flags[category]).forEach((flag) => {
+      if (flag !== "__active") {
+        flags[category][flag] = true;
+      }
+    });
+  };
+
+  Object.keys(filterChanges).forEach((category) => {
     if (filterChanges[category] === "all") {
       enableAllFlagsForCategory(flags.value, category);
     } else {
-      object.keys(flags.value[category]).foreach((flag) => {
-        flags.value[category][flag] = false;
+      Object.keys(flags.value[category]).forEach((flag) => {
+        if (flag !== "__active") {
+          flags.value[category][flag] = false;
+        }
       });
       flags.value[category][filterChanges[category]] = true;
     }
   });
+};
 
-  const enableAllFlagsForCategory = (flags, category) => {
-    object.keys(flags[category]).foreach((flag) => {
-      flags[category][flag] = true;
-    });
-  };
+const boolFlags = ref([]);
+
+const isColumnShown = (col) => {
+  boolFlags.value = [];
+  for (const category of Object.values(flags.value)) {
+    let categoryFlags = [];
+    for (const [subKey, subValue] of Object.entries(category)) {
+      if (subKey !== "__active") {
+        if (category["__active"] === false) {
+          categoryFlags.push(false);
+        } else {
+          categoryFlags.push(subValue);
+        }
+      }
+    }
+    boolFlags.value.push(...categoryFlags);
+  }
+  return boolFlags.value[col];
+};
+
+const calculateTotalForRow = (question, mark) => {
+  let total = 0;
+  const row = 7 * question + mark;
+
+  const preparedData = Object.values(data.value)
+    .map((q) => Object.values(q))
+    .flat();
+
+  total += preparedData[row]
+    .map((v, i) => (boolFlags.value[i] ? v : 0))
+    .reduce((a, b) => a + b, 0);
+
+  return total;
 };
 
 watch(filters, updateFlags, { deep: true });
@@ -728,7 +564,7 @@ td {
   font-weight: bold;
 }
 
-.flagss {
+.flags {
   display: flex;
   width: 100%;
   justify-content: center;

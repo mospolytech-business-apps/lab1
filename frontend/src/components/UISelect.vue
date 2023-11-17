@@ -49,25 +49,32 @@ const changeOption = (event) => {
   color: #000;
   cursor: pointer;
   padding-inline-end: 30px;
+  &:disabled {
+    background-color: lightgray;
+    opacity: 0.2;
+    cursor: not-allowed;
+  }
 }
 
 .select-wrapper {
   position: relative;
-}
-
-.select-wrapper::after {
-  content: "▾";
-  position: absolute;
-  display: block;
-  width: 28px;
-  height: 32px;
-  padding-top: 0.3rem;
-  padding-inline: 0.48rem;
-  top: 0;
-  right: 0;
-  background-size: contain;
-  pointer-events: none;
-  border-left: 1px solid #757575;
+  &::after {
+    content: "▾";
+    position: absolute;
+    display: block;
+    width: 28px;
+    height: 32px;
+    padding-top: 0.3rem;
+    padding-inline: 0.48rem;
+    top: 0;
+    right: 0;
+    background-size: contain;
+    pointer-events: none;
+    border-left: 1px solid #757575;
+  }
+  &:has(.select:disabled)::after {
+    opacity: 0.2;
+  }
 }
 
 .placeholder {

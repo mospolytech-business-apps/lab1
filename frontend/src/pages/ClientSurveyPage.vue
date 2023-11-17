@@ -67,7 +67,7 @@
     </main>
   </template>
   <template v-else>
-    <DetailedReportJSON report="report" />
+    <DetailedReportJSON :report="report" />
   </template>
 </template>
 
@@ -100,7 +100,6 @@ const fetchReport = async () => {
   try {
     const response = await fetch(apiUrl);
     report.value = await response.json();
-    console.log(report.value);
   } catch (error) {
     console.error("Error fetching report:", error);
   }
