@@ -81,7 +81,7 @@ class UserViewset(ModelViewSet):
         return Response({"message": "Пользователь забанен"})
 
     @action(
-        methods=["POST"],
+        methods=["PUT"],
         detail=True,
         permission_classes=[IsAdminUser],
         url_path="unban-users",
@@ -93,7 +93,7 @@ class UserViewset(ModelViewSet):
         return Response({"message": "Пользователь разбанен"})
 
     @action(
-        methods=["POST"],
+        methods=["PUT"],
         detail=True,
         permission_classes=[IsAdminUser],
         url_path="grant-admin-status",
@@ -106,7 +106,7 @@ class UserViewset(ModelViewSet):
         return Response({"message": "Статус админа присвоен"})
 
     @action(
-        methods=["POST"],
+        methods=["PUT"],
         detail=True,
         permission_classes=[IsAdminUser],
         url_path="revoke-admin-status",
