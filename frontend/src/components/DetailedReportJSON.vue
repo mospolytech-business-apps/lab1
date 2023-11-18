@@ -94,18 +94,33 @@
             <td colspan="16" class="statistics">
               <span class="meta-wrapper">
                 <div
-                  style="--dont-know: {{ totals[qi][1] / totals.sum * 100 }}%"
+                  :style="`--dont-know: ${percentage(qi, 1)}%`"
                   class="dont-know"
                 ></div>
-                <div style="--poor: 14.2%" class="poor"></div>
                 <div
-                  style="--needs-improvement: 14.2%"
+                  :style="`--poor: ${percentage(qi, 2)}%;`"
+                  class="poor"
+                ></div>
+                <div
+                  :style="`--needs-improvement: ${percentage(qi, 3)}%;`"
                   class="needs-improvement"
                 ></div>
-                <div style="--adequate: 14.2%" class="adequate"></div>
-                <div style="--good: 14.2%" class="good"></div>
-                <div style="--very-good: 14.2%" class="very-good"></div>
-                <div style="--outstanding: 14.2%" class="outstanding"></div>
+                <div
+                  :style="`--adequate: ${percentage(qi, 4)}%;`"
+                  class="adequate"
+                ></div>
+                <div
+                  :style="`--good: ${percentage(qi, 5)}%;`"
+                  class="good"
+                ></div>
+                <div
+                  :style="`--very-good: ${percentage(qi, 6)}%;`"
+                  class="very-good"
+                ></div>
+                <div
+                  :style="`--outstanding: ${percentage(qi, 7)}%;`"
+                  class="outstanding"
+                ></div>
               </span>
             </td>
           </tr>
@@ -291,6 +306,17 @@ const isColumnShown = (col) => {
   return boolFlags.value[col];
 };
 
+const percentage = (qN, mN) => {
+  const ss = qN * 7;
+  const se = ss + 7;
+  const mark = totals.value[qN * 7 + mN - 1];
+  const totalsSum = totals.value.slice(ss, se).reduce((a, b) => a + b, 0);
+
+  return (mark / totalsSum) * 100;
+};
+
+const totals = ref([]);
+
 const calculateTotalForRow = (question, mark) => {
   let total = 0;
   const row = 7 * question + mark;
@@ -303,6 +329,7 @@ const calculateTotalForRow = (question, mark) => {
     .map((v, i) => (boolFlags.value[i] ? v : 0))
     .reduce((a, b) => a + b, 0);
 
+  totals.value[row] = total;
   return total;
 };
 
@@ -382,6 +409,7 @@ td {
 }
 
 .meta-description {
+  width: 30%;
   text-align: start;
   font-weight: bold;
 }
