@@ -310,9 +310,9 @@ const percentage = (qN, mN) => {
   const ss = qN * 7;
   const se = ss + 7;
   const mark = totals.value[qN * 7 + mN - 1];
-  const totalsSum = totals.value.slice(ss, se).reduce((a, b) => a + b, 0);
+  const totalSum = totals.value.slice(ss, se).reduce((a, b) => a + b, 0);
 
-  return (mark / totalsSum) * 100;
+  return (mark / totalSum) * 100;
 };
 
 const totals = ref([]);
