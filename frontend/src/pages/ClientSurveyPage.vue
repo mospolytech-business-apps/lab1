@@ -14,8 +14,8 @@
       <h1 class="visually-hidden">Client Survey Summary</h1>
       <div class="table-container">
         <div class="table-heading">
-          <p>Fieldwork June 2017-October 2017</p>
-          <p>Sample Size: 1727 adults</p>
+          <p>{{ period }}</p>
+          <p>{{ amountOfSurveyed }}</p>
         </div>
         <div class="table-wrapper">
           <table class="table">
@@ -45,20 +45,7 @@
             </thead>
             <tbody>
               <tr>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
-                <td>888</td>
+                <td v-for="mark in reportSummary">{{ mark }}</td>
               </tr>
             </tbody>
           </table>
@@ -67,31 +54,85 @@
     </main>
   </template>
   <template v-else>
-    <DetailedReport />
+    <DetailedReportJSON :report="report" :summary="summary" />
   </template>
 </template>
 
 <script setup>
-import DetailedReport from "@/components/DetailedReport.vue";
+import DetailedReportJSON from "@/components/DetailedReportJSON.vue";
 import UIHeader from "@/components/UIHeader.vue";
 import UINav from "@/components/UINav.vue";
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
 
 const isSummaryShown = ref(true);
+const report = ref(null);
+const apiUrl = "src/data/summary-report.json";
+const summary = ref(null);
+const reportSummary = ref([]);
 
-const downloadPDF = async () => {
+const fetchReport = async () => {
   try {
-    const response = await fetch("src/data/CaseStudy.pdf", {
-      responseType: "arraybuffer",
-    });
-
-    const buffer = await response.arrayBuffer();
-    const blob = new Blob([buffer], { type: "application/pdf" });
-    blob.saveAs(blob, "CaseStudy.pdf");
+    const response = await fetch(apiUrl);
+    report.value = await response.json();
+    createSummary();
+    createReportSummary();
+    setAmountOfSurveyed();
+    setPeriod();
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching report:", error);
   }
 };
+
+const createSummary = () => {
+  summary.value = {
+    all: JSON.parse(JSON.stringify(Object.values(report.value)[0])),
+  };
+
+  for (const [t, time] of Object.entries(report.value)) {
+    if (Object.keys(report.value)[0] === t) {
+      continue;
+    }
+    for (const [q, question] of Object.entries(time)) {
+      for (const [m, mark] of Object.entries(question)) {
+        summary.value["all"][q][m] = summary.value["all"][q][m].map(
+          (value, index) => value + mark[index]
+        );
+      }
+    }
+  }
+};
+
+const createReportSummary = () => {
+  reportSummary.value = JSON.parse(
+    JSON.stringify(Object.values(Object.values(summary.value["all"])[0])[0])
+  );
+
+  for (const [q, question] of Object.entries(summary.value["all"])) {
+    for (const [m, mark] of Object.entries(question)) {
+      for (const [i, value] of Object.entries(mark)) {
+        reportSummary.value[i] += value;
+      }
+    }
+  }
+};
+
+const period = ref(null);
+
+const setPeriod = () => {
+  period.value = `Fieldwork ${Object.keys(report.value)[0]} – ${
+    Object.keys(report.value)[Object.keys(report.value).length - 1]
+  }`;
+};
+
+const amountOfSurveyed = ref(null);
+
+const setAmountOfSurveyed = () => {
+  amountOfSurveyed.value = `Sample Size: ${
+    reportSummary.value.at(0) + reportSummary.value[1]
+  } adults`;
+};
+
+onMounted(fetchReport);
 </script>
 
 <style scoped>
