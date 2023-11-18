@@ -67,7 +67,7 @@
     </main>
   </template>
   <template v-else>
-    <DetailedReportJSON :report="report" />
+    <DetailedReportJSON :report="report" :summary="summary" />
   </template>
 </template>
 
@@ -75,37 +75,46 @@
 import DetailedReportJSON from "@/components/DetailedReportJSON.vue";
 import UIHeader from "@/components/UIHeader.vue";
 import UINav from "@/components/UINav.vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const isSummaryShown = ref(true);
-
-// const downloadPDF = async () => {
-//   try {
-//     const response = await fetch("src/data/CaseStudy.pdf", {
-//       responseType: "arraybuffer",
-//     });
-
-//     const buffer = await response.arrayBuffer();
-//     const blob = new Blob([buffer], { type: "application/pdf" });
-//     blob.saveAs(blob, "CaseStudy.pdf");
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
 const report = ref(null);
-
 const apiUrl = "src/data/summary-report.json";
+const summary = ref(null);
+
 const fetchReport = async () => {
   try {
     const response = await fetch(apiUrl);
     report.value = await response.json();
+    updateSummary();
   } catch (error) {
     console.error("Error fetching report:", error);
   }
 };
 
-fetchReport();
+const updateSummary = () => {
+  summary.value = {
+    all: JSON.parse(JSON.stringify(Object.values(report.value)[0])),
+  };
+
+  for (const [t, time] of Object.entries(report.value)) {
+    if (Object.keys(report.value)[0] === t) {
+      continue;
+    }
+    for (const [q, question] of Object.entries(time)) {
+      for (const [m, mark] of Object.entries(question)) {
+        summary.value["all"][q][m] = summary.value["all"][q][m].map(
+          (value, index) => value + mark[index]
+        );
+        console.log(summary.value["all"][q][m]);
+      }
+    }
+  }
+
+  console.log(summary.value);
+};
+
+onMounted(fetchReport);
 </script>
 
 <style scoped>

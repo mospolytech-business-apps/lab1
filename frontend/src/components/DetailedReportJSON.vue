@@ -3,11 +3,11 @@
     <h1 class="visually-hidden">Client Detailed Survey</h1>
     <label class="field">
       <span class="label">Time period: </span>
-      <UISelect>
+      <UISelect v-model="selectedPeriod">
         <option value="all">All period</option>
-        <option value="july2017">July 2017</option>
-        <option value="august2017">August 2017</option>
-        <option value="september2017">September 2017</option>
+        <option value="July 2017">July 2017</option>
+        <option value="August 2017">August 2017</option>
+        <option value="September 2017">September 2017</option>
       </UISelect>
     </label>
     <table class="table">
@@ -93,7 +93,10 @@
             </td>
             <td colspan="16" class="statistics">
               <span class="meta-wrapper">
-                <div style="--dont-know: 14.2%" class="dont-know"></div>
+                <div
+                  style="--dont-know: {{ totals[qi][1] / totals.sum * 100 }}%"
+                  class="dont-know"
+                ></div>
                 <div style="--poor: 14.2%" class="poor"></div>
                 <div
                   style="--needs-improvement: 14.2%"
@@ -200,9 +203,18 @@ import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   report: Object,
+  summary: Object,
 });
 
-const data = computed(() => props.report["July 2017"]);
+const selectedPeriod = ref("all");
+
+const data = computed(() => {
+  if (selectedPeriod.value === "all") {
+    return props.summary["all"];
+  } else {
+    return props.report[selectedPeriod.value];
+  }
+});
 
 const filters = ref({
   gender: "all",
