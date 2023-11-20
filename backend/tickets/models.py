@@ -1,21 +1,21 @@
 from django.db import models
-from authentication.models import User
 from schedules.models import Schedule
-from countries.models import Country
-from сabintyps.models import CabinType  
+from cabintypes.models import CabinType
+from authentication.models import User
 
 class Ticket(models.Model):
-    UserID = models.ForeignKey(User, on_delete=models.CASCADE)
-    ScheduleID = models.ForeignKey(Schedule, on_delete=models.CASCADE)
-    CabinTypeID = models.ForeignKey(CabinType, on_delete=models.CASCADE)
-    FirstName = models.CharField(max_length=255)
-    LastName = models.CharField(max_length=255)
-    Email = models.EmailField(max_length=255)
-    Phone = models.CharField(max_length=20)
-    PassportNumber = models.CharField(max_length=255)
-    PassportCountryID = models.ForeignKey(Country, on_delete=models.CASCADE)
-    BookingReference = models.CharField(max_length=255)
-    Confirmed = models.BooleanField(default=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    cabin_type = models.ForeignKey(CabinType, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.EmailField(max_length=50, null=True, blank=True)
+    phone = models.CharField(max_length=14)
+    passport_number = models.CharField(max_length=9)
+    passport_country_id = models.IntegerField()
+    booking_reference = models.CharField(max_length=6)
+    confirmed = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.UserID} - {self.ScheduleID} - {self.FirstName} {self.LastName}"
+        return f"{self.first_name} {self.last_name}"
+

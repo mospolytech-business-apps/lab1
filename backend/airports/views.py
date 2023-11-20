@@ -1,7 +1,9 @@
-from rest_framework.viewsets import ModelViewSet
-from .serializers import AirportSerializer
-from .models import Airport
+from rest_framework import viewsets
 
-class AirportViewset(ModelViewSet):
-    queryset=Airport.objects.all()
-    serializer_class=AirportSerializer
+from airports.models import Airport
+from airports.serializers import AirportSerializer
+
+
+class AirportViewSet(viewsets.ModelViewSet):
+    serializer_class = AirportSerializer
+    queryset = Airport.objects.all()

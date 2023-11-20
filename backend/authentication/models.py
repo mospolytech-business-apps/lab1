@@ -1,31 +1,40 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin
-from offices.models import Office
-from roles.models import Role
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import PermissionsMixin
 from authentication.managers import UserManager
 
-class User(AbstractBaseUser,PermissionsMixin):
-    OfficeID = models.ForeignKey(Office, on_delete=models.CASCADE,null=True)
-    RoleID = models.ForeignKey(Role, on_delete=models.CASCADE,null=True)
-    Email=models.EmailField(verbose_name="Email name",max_length=255,unique=True)
-    password = models.CharField(max_length=255)
-    FirstName=models.CharField(verbose_name="Имя",max_length=255)
-    LastName=models.CharField(verbose_name="Фамилия",max_length=255)
-    Birthday = models.DateField(null=True, blank=True)
-    Active =models.BooleanField(verbose_name='Активирован',default=False)
-    is_staff=models.BooleanField(verbose_name='Персонал',default=False)
-    is_superuser=models.BooleanField(verbose_name='Администратор',default=False)
-    is_client = models.BooleanField(verbose_name='Клиент', default=False)
-    is_banned = models.BooleanField(verbose_name='Заблокирован', default=False)
+from office.models import Office
+from role.models import Role
 
-    USERNAME_FIELD='Email'
-    REQUIRED_FIELDS=['FirstName','LastName']
+
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(verbose_name='E-mail', max_length=500, unique=True)
+    first_name = models.CharField(verbose_name='Имя', max_length=50)
+    last_name = models.CharField(verbose_name='Фамилия', max_length=150)
+    birthday = models.DateField(verbose_name='День рождения', blank=True, null=True)
+    is_active = models.BooleanField(verbose_name='Активность', blank=True, default=False)
+    is_staff = models.BooleanField(verbose_name='Employee status', default=False, help_text='Определяет, может ли пользователь пользоваться инфраструктурой Employee')
+    office = models.ForeignKey(Office, on_delete=models.CASCADE, blank=True, null=True)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, blank=True, null=True)
+    login_logout_times = models.JSONField(
+        verbose_name='Время входа и выхода',
+        blank=True,
+        null=True,
+    )
+
+    # password по умолчанию в AbstractBaseUser
+    # last_login по умолчанию в AbstractBaseUser
+    # is_superuser по умолчанию в PermissionsMixin
 
     objects = UserManager()
 
-    def __str__(self):
-        return self.Email
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
-    class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
+    # Модель для ошибок или сбоев
+class ErrorLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='error_logs')
+    error_msg = models.TextField(verbose_name='Unsuccessful logout reason')
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    

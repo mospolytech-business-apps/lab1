@@ -1,0 +1,34 @@
+### Get all workouts
+GET http://127.0.0.1:8080/workout
+Content-Type: application/json
+
+### Get workout
+GET http://127.0.0.1:8080/workout/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+### Create workout
+POST http://127.0.0.1:8080/workout
+Content-Type: application/json
+
+{
+    "title" : "Example workout",
+    "description": "Description example",
+    "calories": 999
+}
+
+### Update workout
+PATCH http://127.0.0.1:8080/workout/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+    "title" : "Updated workout",
+    "description": "Updated description example",
+    "calories": 777
+}
+
+### Delete workout
+DELETE  http://127.0.0.1:8080/workout/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{}
+

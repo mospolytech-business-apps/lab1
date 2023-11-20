@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from .models import Amenity
+
+from amenities.models import Amenity
 
 
 class AmenitySerializer(serializers.ModelSerializer):
     class Meta:
-        model= Amenity
-        fields ='__all__'
-        
+        model = Amenity
+        fields = '__all__'

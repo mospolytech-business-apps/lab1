@@ -1,7 +1,9 @@
-from rest_framework.viewsets import ModelViewSet
-from .serializers import AircraftSerializer
-from .models import Aircraft
+from rest_framework import viewsets
 
-class AircraftViewset(ModelViewSet):
-    queryset=Aircraft.objects.all()
-    serializer_class=AircraftSerializer
+from aircrafts.models import Aircraft
+from aircrafts.serializers import AircraftSerializer
+
+
+class AircraftViewSet(viewsets.ModelViewSet):
+    serializer_class = AircraftSerializer
+    queryset = Aircraft.objects.all()
