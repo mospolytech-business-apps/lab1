@@ -3,7 +3,6 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export.formats import base_formats
 
-from role.models import Role
 from schedules.models import Schedule
 
 

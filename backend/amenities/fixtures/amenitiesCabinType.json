@@ -1,0 +1,122 @@
+[
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 1,
+    "fields": {
+      "cabin_type": 2,
+      "amenity": 1
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 2,
+    "fields": {
+      "cabin_type": 3,
+      "amenity": 1
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 3,
+    "fields": {
+      "cabin_type": 2,
+      "amenity": 4
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 4,
+    "fields": {
+      "cabin_type": 3,
+      "amenity": 4
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 5,
+    "fields": {
+      "cabin_type": 3,
+      "amenity": 5
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 6,
+    "fields": {
+      "cabin_type": 2,
+      "amenity": 6
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 7,
+    "fields": {
+      "cabin_type": 3,
+      "amenity": 6
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 8,
+    "fields": {
+      "cabin_type": 1,
+      "amenity": 7
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 9,
+    "fields": {
+      "cabin_type": 2,
+      "amenity": 7
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 10,
+    "fields": {
+      "cabin_type": 3,
+      "amenity": 7
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 11,
+    "fields": {
+      "cabin_type": 3,
+      "amenity": 8
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 12,
+    "fields": {
+      "cabin_type": 3,
+      "amenity": 9
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 13,
+    "fields": {
+      "cabin_type": 1,
+      "amenity": 11
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 14,
+    "fields": {
+      "cabin_type": 2,
+      "amenity": 11
+    }
+  },
+  {
+    "model": "amenities.amenitycabintype",
+    "pk": 15,
+    "fields": {
+      "cabin_type": 3,
+      "amenity": 12
+    }
+  }
+]

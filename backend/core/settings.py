@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     "authentication",
     "country",
     "office",
-    "role",
     "airports",
     "airoutes",
     "aircrafts",
@@ -54,9 +53,8 @@ INSTALLED_APPS = [
     "tickets",
     "cabintypes",
     "amenities",
-    "amenitiesCabinType",
-    "amenitiesTickets",
     "survey",
+    "django_admin_listfilter_dropdown",
 ]
 
 MIDDLEWARE = [
