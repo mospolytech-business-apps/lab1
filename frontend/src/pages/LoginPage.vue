@@ -5,7 +5,12 @@
       <img width="500" class="logo" src="@/assets/logo.png" alt="Amonic" />
       <label class="label">
         <span class="span">Username:</span>
-        <input class="input" type="text" v-model="username" />
+        <input
+          class="input"
+          type="text"
+          v-model="username"
+          ref="usernameInput"
+        />
       </label>
       <label class="label">
         <span class="span">Password:</span>
@@ -20,21 +25,30 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import router from "../router";
-import { useUserRoleStore } from "@/stores/userRole.js";
 import UIHeader from "@/components/UIHeader.vue";
 
-const userRoleStore = useUserRoleStore();
+import { storeToRefs } from "pinia";
+
 const username = ref("");
 const password = ref("");
 
-const onSubmit = () => {
+const onSubmit = async () => {
   let userRole = "";
+
+  const status = await login(username.value, password.value);
+
+  if (status == 200) {
+    userRole = "admin";
+  } else {
+    userRole = "user";
+  }
 
   if (username.value == "admin" && password.value == "admin") {
     userRole = "admin";
   }
+
   if (username.value == "user" && password.value == "user") {
     userRole = "user";
   }
@@ -44,7 +58,11 @@ const onSubmit = () => {
   router.push("/");
 };
 
-const exit = ref(null);
+const usernameInput = ref(null);
+
+onMounted(() => {
+  usernameInput.value.focus();
+});
 
 const openExit = () => {
   popup.value?.show();

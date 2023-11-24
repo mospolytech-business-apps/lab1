@@ -1,28 +1,33 @@
 import { defineStore } from "pinia";
 
-export const useLogoutStore = defineStore("logout", {
-  state: () => ({
-    lastLogin: JSON.parse(localStorage.getItem("logoutInformation")),
-    logoutReason: localStorage.getItem("logoutInformation"),
-  }),
-  getters: {
-    isNoLogoutDetected() {
-      return !!(this.lastLogin && !this.logoutReason);
-    },
-  },
-  actions: {
-    setLogoutInformation(lastLogin, logoutReason) {
-      this.lastLogin = lastLogin;
-      this.logoutReason = logoutReason;
+export const useLogoutStore = defineStore("logout", () => {
+  const lastLogin = ref(JSON.parse(localStorage.getItem("logoutInformation")));
+  const logoutReason = ref(localStorage.getItem("logoutInformation"));
 
-      localStorage.setItem(
-        "logoutInformation",
-        JSON.stringify({ lastLogin, logoutReason })
-      );
-    },
-    resetLogoutInformation() {
-      this.lastLogin = null;
-      this.logoutReason = null;
-    },
-  },
+  const isNoLogoutDetected = computed(() => {
+    return !!(this.lastLogin && !this.logoutReason);
+  });
+
+  const setLogoutInformation = (lastLogin, logoutReason) => {
+    lastLogin.value = lastLogin;
+    logoutReason.value = logoutReason;
+
+    localStorage.setItem(
+      "logoutInformation",
+      JSON.stringify({ lastLogin, logoutReason })
+    );
+  };
+
+  const resetLogoutInformation = () => {
+    lastLogin.value = null;
+    logoutReason.value = null;
+  };
+
+  return {
+    lastLogin,
+    logoutReason,
+    isNoLogoutDetected,
+    setLogoutInformation,
+    resetLogoutInformation,
+  };
 });
