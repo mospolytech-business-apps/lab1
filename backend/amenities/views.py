@@ -16,25 +16,22 @@ class AmenityViewSet(viewsets.ModelViewSet):
     queryset = Amenity.objects.all()
     serializer_class = AmenitySerializer
 
-    @action(detail=False, url_path="amenities-statistics")
+    @action(detail=False, methods=['post'], url_path="amenities-statistics")
     def amenities_statistics(self, request):
-        amenities = Amenity.objects.values_list("name", flat=True)
-        statistics = []
+        ticket_id = request.data.get('ticket_id')
+        if not ticket_id:
+            return Response({"error": "Ticket ID is required."}, status=400)
 
-        cabin_types = CabinType.objects.all()
-        for cabin_type in cabin_types:
-            data = []
-            for amenity in amenities:
-                count = Ticket.objects.filter(
-                    cabin_type=cabin_type, amenityticket__amenity__name=amenity
-                ).count()
-                data.append(count)
+        try:
+            ticket = Ticket.objects.get(pk=ticket_id)
+        except Ticket.DoesNotExist:
+            return Response({"error": "Ticket not found."}, status=404)
 
-            statistics.append({"class": cabin_type.name, "data": data})
+        amenities_data = AmenityTicket.objects.filter(ticket=ticket).values(
+            'amenity__service', 'ticket__firstname', 'ticket__lastname', 'ticket__passport_number'
+        )
 
-        response_data = {"amenities": list(amenities), "statistics": statistics}
-
-        return Response(response_data)
+        return Response({"class": ticket.cabin_type.name, "data": list(amenities_data)})
 
     @action(detail=False, url_path="amenities-cabin-type")
     def amenities_cabin_type(self, request):
