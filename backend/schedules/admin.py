@@ -12,11 +12,35 @@ class ScheduleResource(resources.ModelResource):
 
 
 class ScheduleAdmin(ImportExportModelAdmin):
-    list_display = ("id", "Date", "aircraft_name", "route_info", "Confirmed")
-    list_display_links = ("id", "Date", "aircraft_name", "Confirmed")
+    list_display = (
+        "id",
+        "Date",
+        "formatted_time",  # Display the formatted time
+        "FlightNumber",
+        "aircraft_code",
+        "route_info",
+        "Confirmed",
+    )
+    list_display_links = (
+        "id",
+        "Date",
+        "formatted_time",
+        "FlightNumber",
+        "route_info",
+        "aircraft_code",
+        "Confirmed",
+    )
+
+    admin_order_field = "FlightNumber"
 
     resource_classes = [ScheduleResource]
     formats = [base_formats.XLSX]
+
+    def formatted_time(self, obj):
+        return obj.Time.strftime("%H:%M")
+
+    def aircraft_code(self, obj):
+        return obj.Aircraft.MakeModel
 
     def route_info(self, obj):
         return (
@@ -24,9 +48,6 @@ class ScheduleAdmin(ImportExportModelAdmin):
             + " - "
             + str(obj.Route.ArrivalAirport.IATACode)
         )
-
-    def aircraft_name(self, obj):
-        return obj.Aircraft.Name
 
 
 admin.site.register(Schedule, ScheduleAdmin)
