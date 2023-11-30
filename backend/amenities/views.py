@@ -18,17 +18,17 @@ class AmenityViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], url_path="amenities-statistics")
     def amenities_statistics(self, request):
-        ticket_id = request.data.get('ticket_id')
-        if not ticket_id:
-            return Response({"error": "Ticket ID is required."}, status=400)
+        booking_reference = request.data.get('booking_reference')
+        if not booking_reference:
+            return Response({"error": "Booking reference is required."}, status=400)
 
         try:
-            ticket = Ticket.objects.get(pk=ticket_id)
+            ticket = Ticket.objects.get(booking_reference=booking_reference)
         except Ticket.DoesNotExist:
             return Response({"error": "Ticket not found."}, status=404)
 
         amenities_data = AmenityTicket.objects.filter(ticket=ticket).values(
-            'amenity__service', 'ticket__firstname', 'ticket__lastname', 'ticket__passport_number'
+            'amenity__service', 'ticket__first_name', 'ticket__last_name', 'ticket__passport_number'
         )
 
         return Response({"class": ticket.cabin_type.name, "data": list(amenities_data)})
