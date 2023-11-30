@@ -1,0 +1,4 @@
+# @import auth.http
+
+GET {{BACKEND_URL}}/countries/
+Content-Type: application/json

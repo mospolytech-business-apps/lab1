@@ -1,0 +1,63 @@
+# @import auth.http
+
+### Get all users
+# @ref login 
+GET {{BACKEND_URL}}/users/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+### Get user by id
+# @ref login 
+GET {{BACKEND_URL}}/users/2/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+### Add user
+# @ref login 
+# @name testuser
+POST {{BACKEND_URL}}/users/add/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+{
+    "first_name": "test",
+    "last_name": "test",
+    "password": "test",
+    "email": "test@test.test",
+    "office": "Doha"
+}
+
+### Delete user by id
+# @ref login 
+# @ref testuser
+DELETE {{BACKEND_URL}}/users/delete/{{testuser.id}}/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+### Ban
+# @ref login 
+# @ref testuser
+PUT {{BACKEND_URL}}/users/ban/{{testuser.id}}/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+### Unban
+# @ref login 
+# @ref testuser
+PUT {{BACKEND_URL}}/users/unban/{{testuser.id}}/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+### Grant admin status
+# @ref login 
+# @ref testuser
+PUT {{BACKEND_URL}}/users/grant-admin-status/{{testuser.id}}/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+### Revoke admin status
+# @ref login 
+# @ref testuser
+PUT {{BACKEND_URL}}/users/revoke-admin-status/{{testuser.id}}/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}

@@ -1,0 +1,2 @@
+airport/ [name='airport-list']
+airport/$ID [name='airport-detail']

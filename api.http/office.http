@@ -1,0 +1,4 @@
+# @import auth.http
+### Get list of offices
+GET {{BACKEND_URL}}/offices/
+Content-Type: application/json
