@@ -1,2 +1,14 @@
-airport/ [name='airport-list']
-airport/$ID [name='airport-detail']
+# @import auth.http
+
+### Get all airports
+# @ref login 
+GET {{BACKEND_URL}}/airports/
+Content-Type: application/json
+
+
+### Airport details
+# @ref login 
+GET {{BACKEND_URL}}/airports/2/
+Authorization: Bearer {{login.access}}
+Content-Type: application/json
+

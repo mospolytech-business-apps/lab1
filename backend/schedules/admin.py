@@ -15,7 +15,7 @@ class ScheduleAdmin(ImportExportModelAdmin):
     list_display = (
         "id",
         "Date",
-        "formatted_time",  # Display the formatted time
+        "formatted_time",
         "FlightNumber",
         "aircraft_code",
         "route_info",

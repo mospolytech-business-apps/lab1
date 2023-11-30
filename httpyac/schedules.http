@@ -8,7 +8,7 @@ Content-Type: application/json
 
 ### Import schedules
 # @ref login 
-POST {{BACKEND_URL}}/schedules/import/
+POST {{BACKEND_URL}}/schedules/import-csv/
 Authorization: Bearer {{login.access}}
 Content-Type: multipart/form-data; boundary=WebKitFormBoundary
 
@@ -17,7 +17,7 @@ invoice_title
 Content-Disposition: form-data; name="file"; filename="Schedules_V12_2.csv"
 Content-Type: text/csv
 
-< ./Schedules_V12_2.xls
+< ./Schedules_V12_2.csv
 --WebKitFormBoundary--
 
 
