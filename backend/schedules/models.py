@@ -10,4 +10,4 @@ class Schedule(models.Model):
     Route = models.ForeignKey(Route, on_delete=models.CASCADE)
     EconomyPrice = models.DecimalField(max_digits=10, decimal_places=2)
     Confirmed = models.BooleanField()
-    FlightNumber = models.CharField(max_length=10, null=True, blank=True)
+    FlightNumber = models.IntegerField()

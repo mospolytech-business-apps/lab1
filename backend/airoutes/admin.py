@@ -12,8 +12,24 @@ class RouteResource(resources.ModelResource):
 
 
 class RouteAdmin(ImportExportModelAdmin):
-    list_display = ("id", "DepartureAirport", "ArrivalAirport", "Distance", "FlightTime")
-    list_display_links = ("id", "DepartureAirport", "ArrivalAirport")
+    list_display = (
+        "id",
+        "departure_airport",
+        "arrival_airport",
+        "Distance",
+        "FlightTime",
+    )
+    list_display_links = (
+        "id",
+        "departure_airport",
+        "arrival_airport",
+    )
+
+    def departure_airport(self, obj):
+        return obj.DepartureAirport.IATACode
+
+    def arrival_airport(self, obj):
+        return obj.ArrivalAirport.IATACode
 
     resource_classes = [RouteResource]
     formats = [base_formats.XLSX]

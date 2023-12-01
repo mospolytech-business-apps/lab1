@@ -2,8 +2,6 @@ from django.contrib import admin
 from survey.models import Survey
 from django_admin_listfilter_dropdown.filters import (
     DropdownFilter,
-    ChoiceDropdownFilter,
-    RelatedDropdownFilter,
 )
 
 

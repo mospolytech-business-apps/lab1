@@ -215,7 +215,7 @@ class UserViewSet(ModelViewSet):
             last_name=last_name,
             email=email,
             office=office,
-            is_admin=False,
+            is_superuser=False,
         )
 
         user.set_password(password)
@@ -227,7 +227,7 @@ class UserViewSet(ModelViewSet):
         methods=["PUT"],
         detail=False,
         permission_classes=[IsAdminUser],
-        url_path="ban/(?P<id>.*)",
+        url_path="ban/(?P<id>\d+)",
     )
     def ban(self, request, id):
         if not id:
@@ -246,12 +246,11 @@ class UserViewSet(ModelViewSet):
         methods=["PUT"],
         detail=False,
         permission_classes=[IsAdminUser],
-        url_path="unban/(?P<id>.*)",
+        url_path="unban/(?P<id>\d+)",
     )
-    def unban(self, request, id):
+    def ban1(self, request, id):
         if not id:
             return Response({"error": "Not user id provided"})
-
         try:
             user = User.objects.get(id=id)
         except:
@@ -260,7 +259,7 @@ class UserViewSet(ModelViewSet):
         user.is_active = True
         user.save()
 
-        return Response({"message": "Login disabled"})
+        return Response({"message": "Login enabled"})
 
     @action(
         methods=["PUT"],
@@ -268,7 +267,7 @@ class UserViewSet(ModelViewSet):
         permission_classes=[IsAdminUser],
         url_path="grant-admin-status/(?P<id>.*)",
     )
-    def grant_admin_status(self, request, id):
+    def ban2(self, request, id):
         if not id:
             return Response({"error": "Not user id provided"})
 
@@ -288,7 +287,7 @@ class UserViewSet(ModelViewSet):
         permission_classes=[IsAdminUser],
         url_path="revoke-admin-status/(?P<id>.*)",
     )
-    def revoke_admin_status(self, request, id):
+    def ban3(self, request, id):
         if not id:
             return Response({"error": "Not user id provided"})
 

@@ -1,0 +1,34 @@
+# @import auth.http
+
+### Get all amenities 
+GET {{BACKEND_URL}}/amenities/
+
+### Get amenities cabin types
+GET {{BACKEND_URL}}/amenities/amenities-cabin-type/
+
+### Get amenities tickets
+GET {{BACKEND_URL}}/amenities/amenities-tickets/
+
+### Amenities statistics (booking number)
+POST {{BACKEND_URL}}/amenities/amenities-statistics/
+Content-Type: application/json
+
+{
+    "booking_reference": "SE3RD1"
+    "start_date": null,
+    "end_date": null
+}
+
+### Amenities statistics (date range)
+POST {{BACKEND_URL}}/amenities/amenities-statistics/
+Content-Type: application/json
+
+{
+    "booking_reference": null,
+    "start_date": "2020-01-01",
+    "end_date": "2020-01-31"
+}
+
+### Amenities short summary (booking number and date range)
+GET {{BACKEND_URL}}/amenities/amenities-short-summary/
+Content-Type: application/json

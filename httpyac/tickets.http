@@ -1,0 +1,17 @@
+# @import auth.http
+
+### Get all tickets
+# @ref login 
+GET {{BACKEND_URL}}/tickets/
+Content-Type: application/json
+
+### Search ticket (session 3)
+POST {{BACKEND_URL}}/tickets/search/
+{
+   "from_airport": null
+   "to_airport": null
+   "cabin_type": null
+   "outbound_date": null
+   "return_date": null
+}
+

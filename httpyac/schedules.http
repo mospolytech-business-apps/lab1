@@ -1,0 +1,23 @@
+# @import auth.http
+
+### Get schedules
+# @ref login 
+GET {{BACKEND_URL}}/schedules/
+Content-Type: application/json
+
+
+### Import schedules
+# @ref login 
+POST {{BACKEND_URL}}/schedules/import-csv/
+Authorization: Bearer {{login.access}}
+Content-Type: multipart/form-data; boundary=WebKitFormBoundary
+
+invoice_title
+--WebKitFormBoundary
+Content-Disposition: form-data; name="file"; filename="Schedules_V12_2.csv"
+Content-Type: text/csv
+
+< ./Schedules_V12_2.csv
+--WebKitFormBoundary--
+
+
