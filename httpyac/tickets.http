@@ -8,10 +8,10 @@ Content-Type: application/json
 ### Search ticket (session 3)
 POST {{BACKEND_URL}}/tickets/search/
 {
-   "from_airport": null
-   "to_airport": null
-   "cabin_type": null
-   "outbound_date": null
-   "return_date": null
+  "from_airport": "BAH",
+  "to_airport": "AUH",
+  "cabin_type": "economy",
+  "outbound_date": "2017-10-04"
 }
+
 

@@ -22,11 +22,10 @@ class AmenityViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], url_path="amenities-report")
     def amenities_report(self, request):
         booking_reference = request.data.get('booking_reference')
-        flight_id = request.data.get('flight_id')
         start_time = request.data.get('start_time')
         end_time = request.data.get('end_time')
 
-        if not booking_reference and not (flight_id and start_time and end_time):
+        if not booking_reference and not (start_time or end_time):
             return Response({"error": "Необходимо указать либо код бронирования, либо идентификатор рейса, начальное и конечное время."}, status=400)
 
         try:
@@ -36,14 +35,20 @@ class AmenityViewSet(viewsets.ModelViewSet):
                     'amenity__name', 'ticket__cabin_type', 'ticket__first_name', 'ticket__last_name', 'ticket__passport_number'
                 )
                 return Response({"class": ticket.cabin_type.name, "data": list(amenities_data)})
-            
-            elif flight_id and start_time and end_time:
-                schedule = Schedule.objects.get(pk=flight_id)
-                tickets = Ticket.objects.filter(schedule=schedule, schedule__Date__gte=start_time, schedule__Date__lte=end_time)
 
+            elif start_time or end_time:
+                tickets = Ticket.objects.filter(schedule__Date__gte=start_time, schedule__Date__lte=end_time)
+
+                if not tickets.exists():
+                    return Response({"error": "Билеты не найдены."}, status=404)
+
+                # Сбор всех подходящих под фильтр объектов AmenityTicket
                 amenities_data = AmenityTicket.objects.filter(ticket__in=tickets).values(
                     'amenity__name', 'ticket__cabin_type', 'ticket__first_name', 'ticket__last_name', 'ticket__passport_number'
                 )
+
+                if not amenities_data.exists():
+                    return Response({"error": "Данные по услугам не найдены."}, status=404)
 
                 # Форматирование данных как указано
                 amenities = [item['amenity__name'] for item in amenities_data]
@@ -57,7 +62,6 @@ class AmenityViewSet(viewsets.ModelViewSet):
                         statistics[item['ticket__cabin_type']][0] += 1
                     elif item['amenity__name'] == "Another Amenity":
                         statistics[item['ticket__cabin_type']][1] += 1
-
 
                 result = {
                     "amenities": amenities,
