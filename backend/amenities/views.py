@@ -11,7 +11,9 @@ from rest_framework.response import Response
 from tickets.models import Ticket
 from cabintypes.models import CabinType
 from schedules.models import Schedule
-
+from office.models import Office
+from django.db.models import Count
+from authentication.models import User
 
 class AmenityViewSet(viewsets.ModelViewSet):
     queryset = Amenity.objects.all()
@@ -70,6 +72,39 @@ class AmenityViewSet(viewsets.ModelViewSet):
             return Response({"error": "Билет или рейс не найден."}, status=404)
         except Exception as e:
             return Response({"error": f"Произошла ошибка: {str(e)}"}, status=500)
+        
+    @action(detail=False, methods=['get'], url_path="full-report")
+    def full_report(self, request):
+        # Получение данных по Amenity
+        amenities = Amenity.objects.all()
+        amenities_data = AmenityTicket.objects.filter(amenity__in=amenities).values(
+            'amenity__name', 'ticket__cabin_type', 'ticket__first_name', 'ticket__last_name', 'ticket__passport_number'
+        )
+
+        amenities_result = {
+            "amenities": list(amenities_data),
+        }
+
+        # Получение топ клиентов
+        top_clients = Ticket.objects.values('user__email').annotate(total_tickets=Count('id')).order_by('-total_tickets')[:5]
+        top_clients_result = {
+            "top_clients": list(top_clients),
+        }
+
+        # Получение топ офисов
+        top_offices = Office.objects.values('title').annotate(total_tickets=Count('user__id')).order_by('-total_tickets')[:5]
+        top_offices_result = {
+            "top_offices": list(top_offices),
+        }
+
+        # Общий результат
+        result = {
+            "amenities": amenities_result,
+            "top_clients": top_clients_result,
+            "top_offices": top_offices_result,
+        }
+
+        return Response(result)
 
     @action(detail=False, url_path="amenities-tickets")
     def amenities_tickets(self, request):
