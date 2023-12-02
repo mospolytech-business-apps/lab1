@@ -5,8 +5,8 @@
       <label class="field">
         <span class="label">Please select the text file with the changes</span>
         <div class="file-input-wrapper">
-          <input class="input" type="file" />
-          <UIButton>
+          <input class="input" type="file" ref="fileInput" />
+          <UIButton @click="importData">
             <img
               src="https://cdn.icon-icons.com/icons2/1122/PNG/512/downloaddownarrowsymbolinsquarebutton_79508.png"
               width="25"
@@ -32,17 +32,54 @@
 <script setup>
 import UIHeader from "@/components/UIHeader.vue";
 import UIButton from "@/components/UIButton.vue";
+import { ref } from "vue";
 
 const props = defineProps({
   open: { type: Boolean, required: true },
 });
 const emit = defineEmits(["close"]);
 
+const fileInput = ref(null);
+
 const close = () => {
   emit("close");
 };
 
-const importData = () => {};
+const importData = async () => {
+  console.log("Importing data");
+  console.log(fileInput.value.files.length);
+
+  if (fileInput.value.files.length > 0) {
+    const file = fileInput.value.files[0];
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/schedules/import-csv/",
+        {
+          method: "POST",
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzAxNDI4MjcwLCJpYXQiOjE3MDEzNDE4NzAsImp0aSI6ImY0MzBiYzE0M2FkZTRlYjJiYWVlYzQ1ZWRkMzhiYjViIiwidXNlcl9pZCI6MTB9.EjLzblGVhmLClWIoClb_vUj7qPLgICG2GjqqZ2Hgux0",
+          },
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        console.log("File uploaded successfully");
+      } else {
+        console.error("File upload failed");
+      }
+    } catch (error) {
+      console.error("Error during fetch:", error);
+    }
+  } else {
+    console.log("No file selected");
+  }
+};
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useUserRoleStore } from "@/stores/userRole";
+import { useUsersStore } from "@/stores/users.store";
 
 import AdminHomePage from "@/pages/AdminHomePage.vue";
 import ClientSurveyPage from "@/pages/ClientSurveyPage.vue";
@@ -24,10 +24,8 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: () => {
-        const userRoleStore = useUserRoleStore();
-        return userRoleStore.userRole === "admin"
-          ? AdminHomePage
-          : UserHomePage;
+        const userStore = useUsersStore();
+        return userStore.userRole === "admin" ? AdminHomePage : UserHomePage;
       },
     },
     {
@@ -81,9 +79,9 @@ const accessList = {
 };
 
 router.beforeEach((to, from, next) => {
-  const userRoleStore = useUserRoleStore();
-  const userRole = userRoleStore.userRole;
   let nextCalled = false;
+
+  const userRole = useUsersStore().userRole;
 
   const redirect = () => {
     if (nextCalled) {

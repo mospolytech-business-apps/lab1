@@ -1,7 +1,29 @@
+<script setup>
+import { onMounted, ref } from "vue";
+import router from "@/router";
+import UIHeader from "@/components/UIHeader.vue";
+import { useAuthStore } from "@/stores/auth.store";
+
+const { login } = useAuthStore();
+
+const username = ref("");
+const password = ref("");
+
+const usernameInput = ref(null);
+
+onMounted(() => {
+  usernameInput.value.focus();
+});
+
+const openExit = () => {
+  popup.value?.show();
+};
+</script>
+
 <template>
   <main class="main">
     <UIHeader />
-    <form class="form" @submit.prevent="onSubmit">
+    <form class="form" @submit.prevent="login(username, password)">
       <img width="500" class="logo" src="@/assets/logo.png" alt="Amonic" />
       <label class="label">
         <span class="span">Username:</span>
@@ -23,51 +45,6 @@
     </form>
   </main>
 </template>
-
-<script setup>
-import { onMounted, ref } from "vue";
-import router from "../router";
-import UIHeader from "@/components/UIHeader.vue";
-
-import { storeToRefs } from "pinia";
-
-const username = ref("");
-const password = ref("");
-
-const onSubmit = async () => {
-  let userRole = "";
-
-  const status = await login(username.value, password.value);
-
-  if (status == 200) {
-    userRole = "admin";
-  } else {
-    userRole = "user";
-  }
-
-  if (username.value == "admin" && password.value == "admin") {
-    userRole = "admin";
-  }
-
-  if (username.value == "user" && password.value == "user") {
-    userRole = "user";
-  }
-
-  userRoleStore.setUserRole(userRole);
-
-  router.push("/");
-};
-
-const usernameInput = ref(null);
-
-onMounted(() => {
-  usernameInput.value.focus();
-});
-
-const openExit = () => {
-  popup.value?.show();
-};
-</script>
 
 <style scoped>
 .main {

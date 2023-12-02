@@ -1,37 +1,116 @@
+<script setup>
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import UISelect from "@/components/UISelect.vue";
+
+import { ref, reactive, onMounted, watch, computed } from "vue";
+import { useOfficesStore } from "@/stores/offices.store";
+import { storeToRefs } from "pinia";
+import { useErrorsStore } from "@/stores/errors.store";
+import { useUsersStore } from "@/stores/users.store";
+
+const { addError } = useErrorsStore();
+const { allOffices } = storeToRefs(useOfficesStore());
+const { getAllOffices } = useOfficesStore();
+const { editUser } = useUsersStore();
+
+const props = defineProps({
+  open: { type: Boolean, required: true },
+  user: { type: Object || null, required: true },
+});
+
+const emit = defineEmits(["close"]);
+
+const offices = ref([]);
+const editedUser = ref({});
+
+watch(
+  () => props.user,
+  (newVal) => {
+    editedUser.value = {
+      ...newVal,
+      role: newVal?.is_superuser ? "admin" : "user",
+    };
+  },
+  { immediate: true }
+);
+
+const applyRoleChanges = () => {
+  editUser(editedUser.value.id, {
+    ...editedUser.value,
+    is_superuser: editedUser.value.role === "admin",
+  });
+  emit("updateData");
+  emit("close");
+};
+
+onMounted(async () => {
+  offices.value = allOffices.value.length
+    ? allOffices.value
+    : await getAllOffices();
+});
+
+const close = () => {
+  emit("close");
+};
+</script>
+
 <template>
   <div v-if="props.open" class="modal">
     <UIHeader title="Edit Role" :closeButtonHandler="close" />
     <main class="main">
       <label for="firstName" class="label">First name </label>
-      <input type="text" id="firstName" />
+      <input
+        v-model="editedUser.first_name"
+        type="text"
+        id="firstName"
+      />
 
       <label for="lastName" class="label">Last name</label>
-      <input type="text" id="lastName" />
+      <input v-model="editedUser.last_name" type="text" id="lastName" />
 
       <label for="email" class="label">Email address </label>
-      <input type="email" id="email" />
+      <input v-model="editedUser.email" type="email" id="email" />
 
-      <label for="company" class="label">Office</label>
+      <label for="office" class="label">Office</label>
       <UISelect
-        options="companies"
+        v-model="editedUser.office"
         placeholder="Office name"
         required
-        id="company"
+        id="office"
       >
-        <option v-for="company in companies" :value="company">
-          {{ company }}
+        <option
+          v-for="office in offices"
+          :key="office.id"
+          :value="office.title"
+        >
+          {{ office.title }}
         </option>
       </UISelect>
 
       <label class="role-label" for="role">Role</label>
       <div class="role-inputs">
         <label for="user" class="label">
-          <input class="input" type="radio" name="role" id="user" />
+          <input
+            v-model="editedUser.role"
+            class="input"
+            type="radio"
+            value="user"
+            name="role"
+            id="user"
+          />
           User
         </label>
 
         <label for="admin" class="label">
-          <input class="input" type="radio" name="role" id="admin" />
+          <input
+            v-model="editedUser.role"
+            class="input"
+            type="radio"
+            name="role"
+            value="admin"
+            id="admin"
+          />
           Administrator
         </label>
       </div>
@@ -43,28 +122,6 @@
     </main>
   </div>
 </template>
-
-<script setup>
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-import UISelect from "@/components/UISelect.vue";
-
-const companies = ["Company 1", "Company 2", "Company 3"];
-
-const props = defineProps({
-  open: { type: Boolean, required: true },
-});
-
-const emit = defineEmits(["close"]);
-
-const applyRoleChanges = () => {
-  alert("Role changes not applied!");
-};
-
-const close = () => {
-  emit("close");
-};
-</script>
 
 <style scoped>
 .modal {

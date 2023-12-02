@@ -1,3 +1,46 @@
+<script setup>
+import { ref } from "vue";
+import UIHeader from "@/components/UIHeader.vue";
+import NoLogoutModal from "@/components/NoLogoutModal.vue";
+
+const sessions = [
+  {
+    id: 1,
+    date: "2021-05-01",
+    loginTime: "10:00:00",
+    logoutTime: "10:30:00",
+    timeSpentOnSystem: "00:30:00",
+    unsuccessfulLogoutReason: null,
+  },
+  {
+    id: 2,
+    date: "2021-05-01",
+    loginTime: "10:00:00",
+    logoutTime: null,
+    timeSpentOnSystem: null,
+    unsuccessfulLogoutReason: "System crashed",
+  },
+  {
+    id: 3,
+    date: "2021-05-01",
+    loginTime: "10:00:00",
+    logoutTime: "10:30:00",
+    timeSpentOnSystem: "00:30:00",
+    unsuccessfulLogoutReason: null,
+  },
+  {
+    id: 4,
+    date: "2021-05-01",
+    loginTime: "10:00:00",
+    logoutTime: "10:30:00",
+    timeSpentOnSystem: "00:30:00",
+    unsuccessfulLogoutReason: null,
+  },
+];
+
+const isNoLogoutModalOpen = ref(true);
+</script>
+
 <template>
   <UIHeader title="User Home Page" />
   <main class="main">
@@ -56,52 +99,6 @@
     @close="isNoLogoutModalOpen = false"
   />
 </template>
-
-<script setup>
-import { ref } from "vue";
-import UIHeader from "@/components/UIHeader.vue";
-import NoLogoutModal from "@/components/NoLogoutModal.vue";
-import { useLogoutStore } from "@/stores/logout";
-
-const logoutStore = useLogoutStore();
-
-const sessions = [
-  {
-    id: 1,
-    date: "2021-05-01",
-    loginTime: "10:00:00",
-    logoutTime: "10:30:00",
-    timeSpentOnSystem: "00:30:00",
-    unsuccessfulLogoutReason: null,
-  },
-  {
-    id: 2,
-    date: "2021-05-01",
-    loginTime: "10:00:00",
-    logoutTime: null,
-    timeSpentOnSystem: null,
-    unsuccessfulLogoutReason: "System crashed",
-  },
-  {
-    id: 3,
-    date: "2021-05-01",
-    loginTime: "10:00:00",
-    logoutTime: "10:30:00",
-    timeSpentOnSystem: "00:30:00",
-    unsuccessfulLogoutReason: null,
-  },
-  {
-    id: 4,
-    date: "2021-05-01",
-    loginTime: "10:00:00",
-    logoutTime: "10:30:00",
-    timeSpentOnSystem: "00:30:00",
-    unsuccessfulLogoutReason: null,
-  },
-];
-
-const isNoLogoutModalOpen = ref(true);
-</script>
 
 <style scoped>
 .main {

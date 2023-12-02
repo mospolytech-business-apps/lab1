@@ -3,8 +3,24 @@ from authentication.models import User
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("id", "email", "first_name", "last_name", "birthday")
-    list_display_links = ("id", "email", "first_name", "last_name", "birthday")
+    list_display = (
+        "id",
+        "email",
+        "first_name",
+        "last_name",
+        "is_new",
+        "is_active",
+        "birthday",
+    )
+    list_display_links = (
+        "id",
+        "email",
+        "first_name",
+        "last_name",
+        "is_new",
+        "is_active",
+        "birthday",
+    )
     search_fields = (
         "id",
         "email",

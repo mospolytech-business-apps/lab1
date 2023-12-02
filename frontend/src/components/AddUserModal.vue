@@ -1,36 +1,98 @@
+<script setup>
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import UISelect from "@/components/UISelect.vue";
+
+import { ref, onMounted } from "vue";
+import { useOfficesStore } from "@/stores/offices.store";
+import { useUsersStore } from "@/stores/users.store";
+import { storeToRefs } from "pinia";
+
+const { getAllOffices } = useOfficesStore();
+const { allOffices } = storeToRefs(useOfficesStore());
+const { addUser } = useUsersStore();
+
+const props = defineProps({
+  open: { type: Boolean, required: true },
+  user: { type: Object || null, required: true },
+});
+
+const emit = defineEmits(["close"]);
+
+const offices = ref([]);
+
+const saveUser = () => {
+  addUser({
+    ...formData.value,
+    is_superuser: false,
+  });
+  emit("updateData");
+  emit("close");
+};
+
+const formData = ref({
+  email: "",
+  first_name: "",
+  last_name: "",
+  office: "",
+  birth_date: "",
+  password: "",
+});
+
+onMounted(async () => {
+  offices.value = allOffices.value.length
+    ? allOffices.value
+    : await getAllOffices();
+});
+
+const close = () => {
+  emit("close");
+};
+</script>
+
 <template>
   <div v-if="props.open" class="modal">
     <UIHeader title="Add User" :closeButtonHandler="close" />
     <main class="main">
       <label class="label" for="email">Email address </label>
-      <input class="field" type="email" v-model="formData.email" id="email" />
+      <input
+        class="field"
+        type="email"
+        v-model="formData.email"
+        id="email"
+        required
+      />
 
       <label class="label" for="firstName">First name </label>
       <input
         class="field"
         type="text"
-        v-model="formData.firstName"
+        v-model="formData.first_name"
         id="firstName"
+        required
       />
 
       <label class="label" for="lastName">Last name </label>
       <input
         class="field"
         type="text"
-        v-model="formData.lastName"
+        v-model="formData.last_name"
         id="lastName"
+        required
       />
 
       <label class="label" for="officeName">Office</label>
       <UISelect
+        v-model="formData.office"
         class="field"
         placeholder="Office name"
         placeholderBlue
         placeholderUnderline
         name="officeName"
+        required
       >
-        <option v-for="company in companies" :value="company">
-          {{ company }}
+        <option v-for="office in offices" :value="office.title">
+          {{ office.title }}
         </option>
       </UISelect>
 
@@ -38,7 +100,7 @@
       <input
         class="field"
         type="date"
-        v-model="formData.birthDate"
+        v-model="formData.birth_date"
         placeholder="Birthdate [dd/mm/yy]"
         id="birthDate"
       />
@@ -49,6 +111,7 @@
         type="password"
         v-model="formData.password"
         id="password"
+        required
       />
       <div class="actions">
         <UIButton @click="saveUser">Save</UIButton>
@@ -57,50 +120,6 @@
     </main>
   </div>
 </template>
-
-<script setup>
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-import UISelect from "@/components/UISelect.vue";
-import { ref } from "vue";
-
-const props = defineProps({
-  open: { type: Boolean, required: true },
-});
-
-const emit = defineEmits(["close"]);
-
-const formData = {
-  email: "",
-  firstName: "",
-  lastName: "",
-  officeName: "",
-  birthDate: "",
-  password: "",
-};
-
-const apiUrl = "src/data/companies.json";
-
-const close = () => {
-  emit("close");
-};
-
-const fetchUsers = async () => {
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    companies.value = data;
-  } catch (error) {
-    console.error("Error fetching list of companies:", error);
-  }
-};
-
-const companies = ["Apple", "Google", "Microsoft", "Facebook"];
-
-const saveUser = () => {};
-
-const closeModal = () => {};
-</script>
 
 <style scoped>
 .modal {

@@ -149,35 +149,40 @@ class UserViewSet(ModelViewSet):
         methods=["PATCH"],
         detail=False,
         permission_classes=[IsAdminUser],
-        url_path="edit",
+        url_path="edit/(?P<id>.*)",
     )
-    def edit(self, request):
+    def edit(self, request, id):
         email = request.data.get("email")
         first_name = request.data.get("first_name")
         last_name = request.data.get("last_name")
         office = request.data.get("office")
         login_logout_times = request.data.get("login_logout_times")
         is_active = request.data.get("is_active")
-
-        if email is None:
-            raise ValidationError({"error": "email must not be empty"})
+        is_superuser = request.data.get("is_superuser")
 
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(id=id)
         except User.DoesNotExist:
             raise NotFound({"error": "user with this id was not found"})
 
+        if email:
+            setattr(user, "email", email)
         if first_name:
             setattr(user, "first_name", first_name)
         if last_name:
             setattr(user, "last_name", last_name)
         if is_active is not None:
+            user.is_superuser = is_superuser
+        if is_active is not None:
             user.is_active = is_active
+        office = request.data.get("office")
         if office:
-            setattr(user, "office", Office.objects.get(title=office.get("title")))
+            setattr(user, "office", Office.objects.get(title=office))
+        login_logout_times = request.data.get("login_logout_times")
         if login_logout_times is not None:
             setattr(user, "login_logout_times", login_logout_times)
 
+        user.is_new = False
         user.save()
 
         data = self.serializer_class(user).data
@@ -237,7 +242,9 @@ class UserViewSet(ModelViewSet):
         except:
             return Response({"error": "User with this id was not found"})
 
+        user.is_new = False
         user.is_active = False
+
         user.save()
 
         return Response({"message": "Login disabled"})
@@ -256,47 +263,9 @@ class UserViewSet(ModelViewSet):
         except:
             return Response({"error": "User with this id was not found"})
 
+        user.is_new = False
         user.is_active = True
+
         user.save()
 
         return Response({"message": "Login enabled"})
-
-    @action(
-        methods=["PUT"],
-        detail=False,
-        permission_classes=[IsAdminUser],
-        url_path="grant-admin-status/(?P<id>.*)",
-    )
-    def ban2(self, request, id):
-        if not id:
-            return Response({"error": "Not user id provided"})
-
-        try:
-            user = User.objects.get(id=id)
-        except:
-            return Response({"error": "User with this id was not found"})
-
-        user.is_superuser = True
-        user.save()
-
-        return Response({"message": "Role changed to Admin"})
-
-    @action(
-        methods=["PUT"],
-        detail=False,
-        permission_classes=[IsAdminUser],
-        url_path="revoke-admin-status/(?P<id>.*)",
-    )
-    def ban3(self, request, id):
-        if not id:
-            return Response({"error": "Not user id provided"})
-
-        try:
-            user = User.objects.get(id=id)
-        except:
-            return Response({"error": "User with this id was not found"})
-
-        user.is_superuser = False
-        user.save()
-
-        return Response({"message": "Role changed to User"})

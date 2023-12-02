@@ -16,6 +16,7 @@
       <option v-if="props.placeholder" disabled selected value="">
         {{ props.placeholder }}
       </option>
+      <hr />
       <slot />
     </select>
   </div>

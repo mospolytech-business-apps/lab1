@@ -1,3 +1,25 @@
+<script setup>
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+
+const props = defineProps({
+  open: { type: Boolean, required: true, default: true },
+});
+
+const close = () => {
+  emit("close");
+};
+
+const emit = defineEmits(["close", "submit"]);
+
+let logoutReason = "";
+let additionalInformation = "";
+
+async function submitForm() {
+  // TODO: submit form
+}
+</script>
+
 <template>
   <div class="modal" v-if="open" ref="modal">
     <UIHeader :title="props.title" :closeButtonHandler="close" />
@@ -27,47 +49,6 @@
   </div>
 </template>
 
-<script setup>
-import { useLogoutStore } from "@/stores/logout";
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-
-const props = defineProps({
-  open: { type: Boolean, required: true, default: true },
-});
-
-const close = () => {
-  emit("close");
-};
-
-const emit = defineEmits(["close", "submit"]);
-
-const logoutStore = useLogoutStore();
-
-let logoutReason = "";
-let additionalInformation = "";
-
-async function submitForm() {
-  const response = await fetch("/api/submit-no-logout-form", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      logoutReason,
-      additionalInformation,
-    }),
-  });
-
-  if (response.ok) {
-    emit("submit");
-    emit("close");
-    alert("Data send successfully. Thank you for your feedback.");
-  } else {
-    alert("An error occurred while submitting the form. Please try again");
-  }
-}
-</script>
 <style scoped>
 .modal {
   position: absolute;

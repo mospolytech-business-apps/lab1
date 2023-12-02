@@ -1,100 +1,52 @@
-import { defineStore } from "pinia";
+import { defineStore, storeToRefs } from "pinia";
 import { api } from "@/api";
-import { addError } from "./error.store";
+import { useErrorsStore } from "@/stores/errors.store";
+import { useUsersStore } from "@/stores/users.store";
+import router from "@/router";
 
-export default useAuthStore = defineStore("auth", () => {
-  const users = ref([]);
-  const offices = ref([]);
-  const isLogoutModalOpen = ref(false);
+import Cookies from "js-cookie";
+
+export const useAuthStore = defineStore("auth", () => {
+  const { addError } = useErrorsStore();
+  const { currentUser, userRole } = storeToRefs(useUsersStore());
 
   const login = async (username, password) => {
-    try {
-      const status = await api.login({
-        username,
-        password,
-      });
+    const { res, err } = await api.login({
+      username,
+      password,
+    });
 
-      if (!data.is_active) {
-        throw new Error("Пользователь заблокирован");
-      }
-
-      cookie.setCookie(ACCESS_TOKEN, access);
-
-      commit("setUser", data);
-    } catch (error) {
-      if (error instanceof Error) {
-        addError(error.message);
-      }
+    if (err !== null) {
+      addError(err.message);
+      return;
     }
+
+    console.log(res.data);
+
+    currentUser.value = {
+      id: res.data.id,
+      office: res.data.office,
+      role: res.data.role,
+      lastLogin: res.data.last_login,
+      username: res.data.email,
+      firstName: res.data.first_name,
+      lastName: res.data.last_name,
+      birthday: res.data.birthday,
+      isAdmin: res.data.is_superuser,
+      isActive: res.data.is_active,
+      login_logout_times: res.data.login_logout_times,
+    };
+
+    console.log(currentUser.value);
+
+    userRole.value = currentUser.value.isAdmin ? "admin" : "user";
+
+    Cookies.set("ACCESS_TOKEN", res.access);
+
+    router.push("/");
   };
 
-  const me = async ({ token }) => {
-    try {
-      user.value = {
-        id,
-        office,
-        role,
-        lastLogin: last_login,
-        username: email,
-        firstName: first_name,
-        lastName: last_name,
-        birthday,
-        isAdmin: is_superuser,
-        isActive: is_active,
-        login_logout_times,
-      } = await api.getUser({ id, token });
-    } catch (error) {
-      if (error instanceof Error) {
-        addError(error.message);
-      }
-    }
-  };
-
-  const getUser = async ({ id, token }) => {
-    try {
-      user.value = {
-        id,
-        office,
-        role,
-        lastLogin: last_login,
-        username: email,
-        firstName: first_name,
-        lastName: last_name,
-        birthday,
-        isAdmin: is_superuser,
-        isActive: is_active,
-        login_logout_times,
-      } = await api.getUser({ id, token });
-    } catch (error) {
-      if (error instanceof Error) {
-        addError(error.message);
-      }
-    }
-  };
-
-  const editUser = ({ token, email, ...props }) =>
-    fetch(`${BACKEND_URL}/auth/edit/`, {
-      method: "PATCH",
-      headers: {
-        ...headers,
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ email, ...props }),
-    }).then((res) => res.json());
-
-  const getAllUsers = ({ token }) =>
-    fetch(`${BACKEND_URL}/auth/users/`, {
-      method: "GET",
-      headers: { ...headers, Authorization: `Bearer ${token}` },
-    }).then((res) => res.json());
-
-  const getOffices = ({ token }) =>
-    fetch(`${BACKEND_URL}/office/`, {
-      method: "GET",
-      headers: { ...headers, Authorization: `Bearer ${token}` },
-    }).then((res) => res.json());
-
-  const logout = ({ token, error }) =>
+  const logout = async ({ token, error }) =>
     fetch(`${BACKEND_URL}/auth/logout/`, {
       method: "POST",
       headers: {
@@ -104,70 +56,8 @@ export default useAuthStore = defineStore("auth", () => {
       body: JSON.stringify({ error }),
     }).then((res) => res.json());
 
-  const surveys = ({ token }) =>
-    fetch(`${BACKEND_URL}/survey/`, {
-      method: "GET",
-      headers: { ...headers, Authorization: `Bearer ${token}` },
-    }).then((res) => res.json());
-
-  const schedules = ({ token }) =>
-    fetch(`${BACKEND_URL}/schedules/`, {
-      method: "GET",
-      headers: { ...headers, Authorization: `Bearer ${token}` },
-    }).then((res) => res.json());
-
-  const airports = ({ token }) =>
-    fetch(`${BACKEND_URL}/airport/`, {
-      method: "GET",
-      headers: { ...headers, Authorization: `Bearer ${token}` },
-    }).then((res) => res.json());
-
-  const cancelSchedule = ({ token, id }) =>
-    fetch(`${BACKEND_URL}/schedules/${id}/`, {
-      method: "PATCH",
-      headers: {
-        ...headers,
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ Confirmed: false }),
-    }).then((res) => res.json());
-
-  const updateSchedule = ({ token, id, Date, Time, EconomyPrice }) =>
-    fetch(`${BACKEND_URL}/schedules/${id}/`, {
-      method: "PATCH",
-      headers: {
-        ...headers,
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ Date, Time, EconomyPrice }),
-    }).then((res) => res.json());
-
-  const importSchedules = ({ token, formData }) =>
-    fetch(`${BACKEND_URL}/schedules/import/`, {
-      method: "POST",
-      headers: {
-        ...headers,
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    }).then((res) => res.json());
-
   return {
-    users,
-    offices,
-    isLogoutModalOpen,
     login,
-    me,
-    getUser,
-    editUser,
-    getAllUsers,
-    getOffices,
     logout,
-    surveys,
-    schedules,
-    airports,
-    cancelSchedule,
-    updateSchedule,
-    importSchedules,
   };
 });

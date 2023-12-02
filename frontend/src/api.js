@@ -4,101 +4,329 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-export const login = ({ username, password }) =>
-  fetch(`${BACKEND_URL}/auth/login/`, {
-    method: "POST",
-    headers: { ...headers },
-    body: JSON.stringify({ email: username, password }),
-  }).then((res) => res.json());
+export const api = {
+  //auth
+  login: async ({ username, password }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/auth/login/`, {
+        method: "POST",
+        headers: { ...headers },
+        body: JSON.stringify({ email: username, password }),
+      });
 
-export const me = ({ token }) =>
-  fetch(`${BACKEND_URL}/auth/me/`, {
-    method: "GET",
-    headers: { ...headers, Authorization: `Bearer ${token}` },
-  }).then((res) => res.json());
+      const data = await response.json();
 
-export const getUser = ({ id, token }) =>
-  fetch(`${BACKEND_URL}/auth/user/${id}`, {
-    method: "GET",
-    headers: { ...headers, Authorization: `Bearer ${token}` },
-  }).then((res) => res.json());
+      if (!response.ok) {
+        throw new Error(`☠️ ${data.error} (${response.status}) `);
+      }
 
-export const editUser = ({ token, email, ...props }) =>
-  fetch(`${BACKEND_URL}/auth/edit/`, {
-    method: "PATCH",
-    headers: {
-      ...headers,
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ email, ...props }),
-  }).then((res) => res.json());
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
 
-export const getAllUsers = ({ token }) =>
-  fetch(`${BACKEND_URL}/auth/users/`, {
-    method: "GET",
-    headers: { ...headers, Authorization: `Bearer ${token}` },
-  }).then((res) => res.json());
+  logout: async ({ accessToken }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/auth/logout/`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-export const offices = ({ token }) =>
-  fetch(`${BACKEND_URL}/office/`, {
-    method: "GET",
-    headers: { ...headers, Authorization: `Bearer ${token}` },
-  }).then((res) => res.json());
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
 
-export const logout = ({ token, error }) =>
-  fetch(`${BACKEND_URL}/auth/logout/`, {
-    method: "POST",
-    headers: {
-      ...headers,
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ error }),
-  }).then((res) => res.json());
+      const data = await response.json();
 
-export const surveys = ({ token }) =>
-  fetch(`${BACKEND_URL}/survey/`, {
-    method: "GET",
-    headers: { ...headers, Authorization: `Bearer ${token}` },
-  }).then((res) => res.json());
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
 
-export const schedules = ({ token }) =>
-  fetch(`${BACKEND_URL}/schedules/`, {
-    method: "GET",
-    headers: { ...headers, Authorization: `Bearer ${token}` },
-  }).then((res) => res.json());
+  // users
+  getAllUsers: async ({ accessToken }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/users/`, {
+        method: "GET",
+        headers: { ...headers, Authorization: `Bearer ${accessToken}` },
+      });
 
-export const airports = ({ token }) =>
-  fetch(`${BACKEND_URL}/airport/`, {
-    method: "GET",
-    headers: { ...headers, Authorization: `Bearer ${token}` },
-  }).then((res) => res.json());
+      if (!response.ok) {
+        throw new Error(`(${response.status}) Error requesting all users`);
+      }
 
-export const cancelSchedule = ({ token, id }) =>
-  fetch(`${BACKEND_URL}/schedules/${id}/`, {
-    method: "PATCH",
-    headers: {
-      ...headers,
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ Confirmed: false }),
-  }).then((res) => res.json());
+      const data = await response.json();
 
-export const updateSchedule = ({ token, id, Date, Time, EconomyPrice }) =>
-  fetch(`${BACKEND_URL}/schedules/${id}/`, {
-    method: "PATCH",
-    headers: {
-      ...headers,
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ Date, Time, EconomyPrice }),
-  }).then((res) => res.json());
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
 
-export const importSchedules = ({ token, formData }) =>
-  fetch(`${BACKEND_URL}/schedules/import/`, {
-    method: "POST",
-    headers: {
-      ...headers,
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  }).then((res) => res.json());
+  getUser: async ({ accessToken, id }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/users/${id}/`, {
+        method: "GET",
+        headers: { ...headers, Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `(${response.status}) Error requesting the user with id ${id}`
+        );
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  addUser: async ({ accessToken, ...props }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/users/add/`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(props),
+      });
+
+      if (!response.ok) {
+        throw new Error(`(${response.status}) Error adding the user`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  editUser: async ({ accessToken, id, ...props }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/users/edit/${id}/`, {
+        method: "PATCH",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(props[0]),
+      });
+
+      if (!response.ok) {
+        throw new Error(`(${response.status}) Error updating the user`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  banUser: async ({ accessToken, id }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/users/ban/${id}/`, {
+        method: "PUT",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`(${response.status}) Error banning the user`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      console.log(error);
+      return { res: null, err: error };
+    }
+  },
+
+  unbanUser: async ({ accessToken, id }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/users/unban/${id}/`, {
+        method: "PUT",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`(${response.status}) Error unbanning the user`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      console.log(error);
+      return { res: null, err: error };
+    }
+  },
+
+  // offices
+  getAllOffices: async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/offices/`, {
+        method: "GET",
+        headers: { ...headers },
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  // report
+  report: async ({ accessToken }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/report/`, {
+        method: "GET",
+        headers: { ...headers, Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  // schedules
+  schedules: async ({ accessToken }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/schedules/`, {
+        method: "GET",
+        headers: { ...headers, Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  cancelSchedule: async ({ accessToken, id }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/schedules/${id}/`, {
+        method: "PATCH",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ Confirmed: false }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  updateSchedule: async ({ accessToken, id, Date, Time, EconomyPrice }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/schedules/${id}/`, {
+        method: "PATCH",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ Date, Time, EconomyPrice }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  importSchedules: async ({ accessToken, formData }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/schedules/import/`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  // airports
+  airports: async ({ accessToken }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/airport/`, {
+        method: "GET",
+        headers: { ...headers, Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+};

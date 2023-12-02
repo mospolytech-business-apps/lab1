@@ -14,6 +14,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(
         verbose_name="Активность", blank=True, default=False
     )
+    is_new = models.BooleanField(
+        verbose_name="Новый пользователь",
+        default=True,
+        help_text="Определяет, новый ли пользователь",
+    )
     is_staff = models.BooleanField(
         verbose_name="Employee status",
         default=False,

@@ -27,6 +27,22 @@ Authorization: Bearer {{login.access}}
     "office": "Doha"
 }
 
+### Edit user
+# @ref login 
+# @ref testuser
+PATCH {{BACKEND_URL}}/users/edit/{{testuser.id}}/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+{
+    "first_name": "testEdit",
+    "last_name": "testEdit",
+    "password": "test",
+    "email": "test@test.test",
+    "office": "Doha"
+}
+
+
 ### Delete user by id
 # @ref login 
 # @ref testuser
@@ -45,19 +61,5 @@ Authorization: Bearer {{login.access}}
 # @ref login 
 # @ref testuser
 PUT {{BACKEND_URL}}/users/unban/{{testuser.id}}/
-Content-Type: application/json
-Authorization: Bearer {{login.access}}
-
-### Grant admin status
-# @ref login 
-# @ref testuser
-PUT {{BACKEND_URL}}/users/grant-admin-status/{{testuser.id}}/
-Content-Type: application/json
-Authorization: Bearer {{login.access}}
-
-### Revoke admin status
-# @ref login 
-# @ref testuser
-PUT {{BACKEND_URL}}/users/revoke-admin-status/{{testuser.id}}/
 Content-Type: application/json
 Authorization: Bearer {{login.access}}
