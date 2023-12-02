@@ -54,7 +54,7 @@
     </main>
   </template>
   <template v-else>
-    <DetailedReportJSON :report="report" :summary="summary" />
+    <DetailedReportJSON :report="sortedReport" :summary="summary" />
   </template>
 </template>
 
@@ -71,9 +71,9 @@ const summary = ref(null);
 const reportSummary = ref([]);
 import { BACKEND_URL } from "@/config";
 
-let apiURL = "src/data/summary-report.json";
+//let apiURL = "src/data/summary-report.json";
 
-apiURL = `${BACKEND_URL}/report`;
+let apiURL = `${BACKEND_URL}/report`;
 
 const period = ref(null);
 const amountOfSurveyed = ref(null);
@@ -83,6 +83,22 @@ const setPeriod = () => {
     Object.keys(report.value)[Object.keys(report.value).length - 1]
   }`;
 };
+
+const sortedReport = computed(() => {
+  console.log("report.value", report.value);
+  const sortedReport = JSON.parse(JSON.stringify(report.value));
+
+  for (const [t, time] of Object.entries(sortedReport)) {
+    for (const [q, question] of Object.entries(time)) {
+      for (const [m, mark] of Object.entries(question)) {
+        sortedReport[t][q][m] = mark.sort((a, b) => b - a);
+      }
+    }
+  }
+
+  console.log("sortedReport", sortedReport);
+  return sortedReport;
+});
 
 const fetchReport = async () => {
   try {

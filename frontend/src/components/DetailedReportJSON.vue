@@ -124,10 +124,12 @@
               </span>
             </td>
           </tr>
-          <tr v-for="(r, rk, i) of q" :key="rk">
+          <tr v-for="([rk, sortedRow], index) in sortedQ(q)" :key="index">
             <td class="meta">{{ rk }}</td>
-            <td class="total">{{ calculateTotalForRow(qi, i) }}</td>
-            <td v-show="isColumnShown(j)" v-for="(d, j) in r">{{ d }}</td>
+            <td class="total">{{ calculateTotalForRow(qi, index) }}</td>
+            <td v-show="isColumnShown(j)" v-for="([d, value], j) in sortedRow">
+              {{ value }}
+            </td>
           </tr>
         </template>
       </tbody>
@@ -215,6 +217,30 @@
 <script setup>
 import UISelect from "@/components/UISelect.vue";
 import { computed, ref, watch } from "vue";
+
+const desiredOrder = [
+  "Outstanding",
+  "Very Good",
+  "Good",
+  "Adequate",
+  "Needs Improvement",
+  "Poor",
+  "Don't know",
+];
+
+// TODO: implement sorting of the Map to preserve the order of the keys
+const sortedQ = (q) => {
+  return new Map(
+    Object.entries(q).map(([rk, row]) => {
+      const sortedRow = new Map(
+        Object.entries(row).sort((a, b) => {
+          return desiredOrder.indexOf(a[0]) - desiredOrder.indexOf(b[0]);
+        })
+      );
+      return [rk, sortedRow];
+    })
+  );
+};
 
 const props = defineProps({
   report: Object,
