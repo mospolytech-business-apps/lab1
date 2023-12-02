@@ -8,7 +8,7 @@ export const useUsersStore = defineStore("users", () => {
   const { addError } = useErrorsStore();
 
   const currentUser = ref({});
-  const userRole = ref(null);
+  const userRole = ref("admin");
   const allUsers = ref([]);
 
   const isLogoutModalOpen = ref(false);

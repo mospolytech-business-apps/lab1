@@ -35,7 +35,7 @@
           <th>AUH</th>
           <th>BAH</th>
           <th>DOH</th>
-          <th>RYU</th>
+          <th>RUH</th>
           <th>CAI</th>
         </tr>
       </thead>
@@ -679,7 +679,7 @@
           <option value="female">AUH</option>
           <option value="female">BUH</option>
           <option value="female">DOH</option>
-          <option value="female">RYU</option>
+          <option value="female">RUH</option>
           <option value="female">CAI</option>
         </UISelect>
       </div>

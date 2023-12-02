@@ -74,17 +74,12 @@
       </div>
     </div>
   </main>
-  <AmenitiesReportModal :open="isAmenitiesReportModalOpen" />
 </template>
 
 <script setup>
 import UIHeader from "@/components/UIHeader.vue";
 import UIButton from "@/components/UIButton.vue";
 import UINav from "@/components/UINav.vue";
-import AmenitiesReportModal from "@/components/AmenitiesReportModal.vue";
-import { ref } from "vue";
-
-const isAmenitiesReportModalOpen = ref(false);
 </script>
 
 <style scoped>

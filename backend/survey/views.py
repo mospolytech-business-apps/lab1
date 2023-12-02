@@ -27,7 +27,7 @@ class SurveyView(APIView):
         ]
 
         data = defaultdict(
-            lambda: defaultdict(lambda: defaultdict(lambda: [x for x in range(14)]))
+            lambda: defaultdict(lambda: defaultdict(lambda: [0 for x in range(14)]))
         )
 
         for survey in surveys:
@@ -50,13 +50,18 @@ class SurveyView(APIView):
                 if survey.gender == "F":
                     metric_list[1] += 1
 
-                age = int(survey.age) if isinstance(survey.age, int) else -1
+                # age = int(survey.age) if isinstance(survey.age, int) else -1
+                try:
+                    age = int(survey.age)
+                except:
+                    age = -1
+
                 if age != -1:
-                    if 18 <= age <= 24:
+                    if age >= 18 and age <= 24:
                         metric_list[2] += 1
-                    if 25 <= age <= 39:
+                    if age >= 25 and age <= 39:
                         metric_list[3] += 1
-                    if 40 <= age <= 59:
+                    if age >= 40 and age <= 59:
                         metric_list[4] += 1
                     if age >= 60:
                         metric_list[5] += 1
@@ -74,7 +79,7 @@ class SurveyView(APIView):
                     metric_list[10] += 1
                 if survey.arrival == "DOH":
                     metric_list[11] += 1
-                if survey.arrival == "RYU":
+                if survey.arrival == "RUH":
                     metric_list[12] += 1
                 if survey.arrival == "CAI":
                     metric_list[13] += 1

@@ -5,9 +5,9 @@
       <span class="label">Time period: </span>
       <UISelect v-model="selectedPeriod">
         <option value="all">All period</option>
+        <option value="May 2017">May 2017</option>
+        <option value="June 2017">June 2017</option>
         <option value="July 2017">July 2017</option>
-        <option value="August 2017">August 2017</option>
-        <option value="September 2017">September 2017</option>
       </UISelect>
     </label>
     <table class="table">
@@ -81,7 +81,7 @@
           <th v-show="flags.airport['AUH'] && flags.airport.__active">AUH</th>
           <th v-show="flags.airport['BAH'] && flags.airport.__active">BAH</th>
           <th v-show="flags.airport['DOH'] && flags.airport.__active">DOH</th>
-          <th v-show="flags.airport['RYU'] && flags.airport.__active">RYU</th>
+          <th v-show="flags.airport['RUH'] && flags.airport.__active">RUH</th>
           <th v-show="flags.airport['CAI'] && flags.airport.__active">CAI</th>
         </tr>
       </thead>
@@ -204,7 +204,7 @@
           <option value="AUH">AUH</option>
           <option value="BAH">BAH</option>
           <option value="DOH">DOH</option>
-          <option value="RYU">RYU</option>
+          <option value="RUH">RUH</option>
           <option value="CAI">CAI</option>
         </UISelect>
       </div>
@@ -258,7 +258,7 @@ const flags = ref({
     AUH: true,
     BAH: true,
     DOH: true,
-    RYU: true,
+    RUH: true,
     CAI: true,
   },
 });

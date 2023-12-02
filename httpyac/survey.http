@@ -1,13 +1,8 @@
 # @import auth.http
 
-### Get all airports
+### Get client survey data
 # @ref login 
-GET {{BACKEND_URL}}/airports/
+GET {{BACKEND_URL}}/report
 Content-Type: application/json
 
 
-### Airport details
-# @ref login 
-GET {{BACKEND_URL}}/airports/2/
-Authorization: Bearer {{login.access}}
-Content-Type: application/json

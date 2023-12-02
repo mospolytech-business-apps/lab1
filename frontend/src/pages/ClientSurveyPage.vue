@@ -39,7 +39,7 @@
                 <th>AUH</th>
                 <th>BAH</th>
                 <th>DOH</th>
-                <th>RYU</th>
+                <th>RUH</th>
                 <th>CAI</th>
               </tr>
             </thead>
@@ -69,10 +69,15 @@ const report = ref(null);
 const apiUrl = "src/data/summary-report.json";
 const summary = ref(null);
 const reportSummary = ref([]);
+import { BACKEND_URL } from "@/config";
+
+let apiURL = "src/data/summary-report.json";
+
+apiURL = `${BACKEND_URL}/report`;
 
 const fetchReport = async () => {
   try {
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiURL);
     report.value = await response.json();
     createSummary();
     createReportSummary();
