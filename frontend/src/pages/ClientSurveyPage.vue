@@ -75,13 +75,36 @@ let apiURL = "src/data/summary-report.json";
 
 apiURL = `${BACKEND_URL}/report`;
 
+const period = ref(null);
+const amountOfSurveyed = ref(null);
+
+const setPeriod = () => {
+  period.value = `Fieldwork ${Object.keys(report.value)[0]} – ${
+    Object.keys(report.value)[Object.keys(report.value).length - 1]
+  }`;
+};
+
 const fetchReport = async () => {
   try {
     const response = await fetch(apiURL);
+
+    if (!response.ok) {
+      throw new Error(`Error fetching report: ${response.status}`);
+    }
+
     report.value = await response.json();
+
+    const objectCount = response.headers.get("X-Object-Count");
+    console.log("objectCount", objectCount, response.headers);
+
+    if (objectCount) {
+      amountOfSurveyed.value = `Sample Size: ${objectCount} adults`;
+    } else {
+      console.error("X-Object-Count header not found");
+    }
+
     createSummary();
     createReportSummary();
-    setAmountOfSurveyed();
     setPeriod();
   } catch (error) {
     console.error("Error fetching report:", error);
@@ -119,22 +142,6 @@ const createReportSummary = () => {
       }
     }
   }
-};
-
-const period = ref(null);
-
-const setPeriod = () => {
-  period.value = `Fieldwork ${Object.keys(report.value)[0]} – ${
-    Object.keys(report.value)[Object.keys(report.value).length - 1]
-  }`;
-};
-
-const amountOfSurveyed = ref(null);
-
-const setAmountOfSurveyed = () => {
-  amountOfSurveyed.value = `Sample Size: ${
-    reportSummary.value.at(0) + reportSummary.value[1]
-  } adults`;
 };
 
 onMounted(fetchReport);

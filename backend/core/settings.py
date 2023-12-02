@@ -68,6 +68,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
 ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
@@ -87,6 +88,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "core.wsgi.application"
+
+CORS_EXPOSE_HEADERS = [
+    "X-Object-Count",
+]
+
+CORS_ALLOW_HEADERS = [
+    "X-Object-Count",
+]
 
 
 # Database
