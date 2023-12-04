@@ -31,9 +31,16 @@ DEBUG = True
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_ALL_HEADERS = True
+
+CORS_EXPOSE_HEADERS = [
+    "X-Object-Count",
+]
+
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,7 +48,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "corsheaders",
     "import_export",
     "authentication",
     "country",
@@ -68,7 +74,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
 ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
@@ -88,14 +93,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "core.wsgi.application"
-
-CORS_EXPOSE_HEADERS = [
-    "X-Object-Count",
-]
-
-CORS_ALLOW_HEADERS = [
-    "X-Object-Count",
-]
 
 
 # Database
