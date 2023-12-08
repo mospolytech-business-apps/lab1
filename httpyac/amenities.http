@@ -1,34 +1,185 @@
 # @import auth.http
 
-### Get all amenities 
+### Get all amenities
+# @ref login
 GET {{BACKEND_URL}}/amenities/
 
-### Get amenities cabin types
-GET {{BACKEND_URL}}/amenities/amenities-cabin-type/
 
-### Get amenities tickets
-GET {{BACKEND_URL}}/amenities/amenities-tickets/
-
-### Amenities statistics (booking number)
-POST {{BACKEND_URL}}/amenities/amenities-statistics/
+### Purchase amenities search
+# @ref login 
+POST {{BACKEND_URL}}/amenities/search/
+Authorization: Bearer {{login.access}}
 Content-Type: application/json
-
 {
-    "booking_reference": "SE3RD1"
+    "booking_reference": "SE3RD1",
+}
+
+/* Response
+{
+    "pessenger": {
+        "name": "John Doe",
+        "passport": "123456789",
+        "cabin_type": "Economy", 
+    },
+    "data": [
+        {
+            "ticket": {
+                "id": 123,
+                "schedule": {
+                    "id": 123,
+                    "flight_number": 1007,
+                    "departure_airport": "AUH",
+                    "arrival_airport": "DOH",
+                    "date": "2017-11-11",
+                    "time": "17:20:00",
+                },
+            }
+            "amenities": [
+                {
+                    "name": "Amenity 1",
+                    "price": 15
+                    "default": true,
+                    "selected": true
+                },
+                {
+                    "name": "Amenity 2",
+                    "price": 20
+                },
+                {
+                    "name": "Amenity 2",
+                    "price": 20
+                }
+            ]
+        },
+        {
+            "ticket": {
+                "id": 123,
+                "schedule": {
+                    "id": 124,
+                    "flight_number": 1008,
+                    "departure_airport": "DOH",
+                    "arrival_airport": "RYD",
+                    "date": "2017-11-11",
+                    "time": "23:00:00",
+                },
+            }
+            "amenities": [
+                {
+                    "id",
+                    "name": "Amenity 1",
+                    "price": 15
+                    "default": true,
+                    "selected": true
+                },
+                {
+                    "id"
+                    "name": "Amenity 2",
+                    "price": 20
+                },
+                {
+                    "name": "Amenity 2",
+                    "price": 20
+                }
+            ]
+        }
+    ]
+}
+*/
+
+
+### Purchase amenities
+POST {{BACKEND_URL}}/amenities/purchase-amenities-for-ticket/123/
+# @ref login 
+Authorization: Bearer {{login.access}}
+Content-Type: application/json
+{
+    "amenities_id": [1, 2, 4, 5]
+}
+
+
+/// Amenities statistics
+
+### Statistics by booking reference
+# @ref login 
+POST {{BACKEND_URL}}/amenities/amenities-report/
+Authorization: Bearer {{login.access}}
+Content-Type: application/json
+{
+    "booking_reference": "SE3RD1",
     "start_date": null,
     "end_date": null
 }
 
-### Amenities statistics (date range)
-POST {{BACKEND_URL}}/amenities/amenities-statistics/
-Content-Type: application/json
 
+### Statistics by data range 
+# @ref login 
+POST {{BACKEND_URL}}/amenities/amenities-report/
+Authorization: Bearer {{login.access}}
+Content-Type: application/json
 {
     "booking_reference": null,
     "start_date": "2020-01-01",
     "end_date": "2020-01-31"
 }
 
+/* Response
+{
+    "amenities": ["Wi-Fi", "Extra Blanket", "Two Neighboring Seats Free", "Laptop Rental"],
+    "data": {
+        "economy": [12, 13, 14, 15],
+        "business": [17, 1, 9, 0],
+        "first": [1, 2, 1, 5]
+    }
+}
+*/
+
+
 ### Amenities short summary (booking number and date range)
-GET {{BACKEND_URL}}/amenities/amenities-short-summary/
+# @ref login 
+GET {{BACKEND_URL}}/amenities/full-report/
 Content-Type: application/json
+{}
+
+/* Response
+{
+    "flights": {
+        "confirmed": 10,
+        "cancelled": 20,
+        "average_daily_flight_time": 20,
+    },
+    "number_of_passengers_busiest": {
+        "day": "2020-01-01",
+        "flights": 123 ,
+    },
+    "number_of_passengers_quiet": {
+        "day": "2020-01-01",
+        "flights": 123 ,
+    },
+    "top_clients": [
+      {
+        "name": "John Doe",
+        "flights": 124
+      },
+      {
+        "name": "John Doe",
+        "flights": 124
+      },
+      {
+        "name": "John Doe",
+        "flights": 124
+      },
+    ],
+    "top_offices": ["Abu dhabi", "Cairo", "Riyadh","Bahrain","Doha"],
+    "revenue": {
+        "yesterday": 57,
+        "two_days_ago": 41,
+        "three_days_ago": 12
+    },
+    "weekly_seats_empty": {
+        "yesterday": 14,
+        "two_days_ago": 12,
+        "three_days_ago": 32
+    },
+    "report_generated_in": 123
+}
+*/

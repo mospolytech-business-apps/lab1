@@ -5,8 +5,10 @@
 GET {{BACKEND_URL}}/tickets/
 Content-Type: application/json
 
-### Search ticket (session 3)
+### Search ticket
 POST {{BACKEND_URL}}/tickets/search/
+Content-Type: application/json
+
 {
   "from_airport": "BAH",
   "to_airport": "AUH",
@@ -14,4 +16,20 @@ POST {{BACKEND_URL}}/tickets/search/
   "outbound_date": "2017-10-04"
 }
 
+### Issue ticket
+POST {{BACKEND_URL}}/tickets/
+Content-Type: application/json
 
+{
+    "user": 1,
+    "schedule": 1,
+    "cabin_type": 1,
+    "first_name": "John",
+    "last_name": "Smith",
+    "email": "test@test.com",
+    "phone": "123456789",
+    "passport_number": "123456789",
+    "passport_country_id": 145,
+    "booking_reference": "123456",
+    "confirmed": true
+}

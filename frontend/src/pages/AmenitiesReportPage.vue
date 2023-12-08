@@ -1,14 +1,12 @@
 <template>
   <UIHeader title="Amenities Report" />
-  <UINav class="menu">
-    <button @click="$router.push('/')">Exit</button>
-  </UINav>
+  <UINav />
   <main class="main">
     <fieldset class="filters">
       <legend>Filter by</legend>
       <label class="field flight-id">
         <span class="label">Flight ID:</span>
-        <input class="input" type="text" placeholder="[XXXXXX]" />
+        <input class="input" type="text" placeholder="[ XXXXXX ]" />
       </label>
       <br />
       <label class="field">
