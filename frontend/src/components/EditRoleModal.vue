@@ -9,7 +9,6 @@ import { storeToRefs } from "pinia";
 import { useErrorsStore } from "@/stores/errors.store";
 import { useUsersStore } from "@/stores/users.store";
 
-const { addError } = useErrorsStore();
 const { allOffices } = storeToRefs(useOfficesStore());
 const { getAllOffices } = useOfficesStore();
 const { editUser } = useUsersStore();
@@ -60,11 +59,7 @@ const close = () => {
     <UIHeader title="Edit Role" :closeButtonHandler="close" />
     <main class="main">
       <label for="firstName" class="label">First name </label>
-      <input
-        v-model="editedUser.first_name"
-        type="text"
-        id="firstName"
-      />
+      <input v-model="editedUser.first_name" type="text" id="firstName" />
 
       <label for="lastName" class="label">Last name</label>
       <input v-model="editedUser.last_name" type="text" id="lastName" />

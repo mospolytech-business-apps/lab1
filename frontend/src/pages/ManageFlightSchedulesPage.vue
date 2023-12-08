@@ -1,3 +1,152 @@
+<script setup>
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import UISelect from "@/components/UISelect.vue";
+import UINav from "@/components/UINav.vue";
+import ScheduleEditModal from "@/components/ScheduleEditModal.vue";
+import ApplyScheduleChangesModal from "@/components/ApplyScheduleChangesModal.vue";
+
+import { onMounted, ref, computed } from "vue";
+import { useSchedulesStore } from "@/stores/schedules.store";
+import { useAirportsStore } from "@/stores/airports.store";
+import { storeToRefs } from "pinia";
+import { useErrorsStore } from "@/stores/errors.store";
+
+const { addError } = useErrorsStore();
+const { allSchedules } = storeToRefs(useSchedulesStore());
+const { getAllSchedules, cancelFlight } = useSchedulesStore();
+const { allAirports } = storeToRefs(useAirportsStore());
+const { getAllAirports } = useAirportsStore();
+
+const isApplyScheduleChangesModalOpen = ref(false);
+const isScheduleEditModalOpen = ref(false);
+
+const airports = ref([]);
+const schedules = ref([]);
+const flights = ref([]);
+const isFiltered = ref(false);
+
+const selectedFlight = ref(null);
+const editingFlightSchedule = ref(null);
+
+const selectFlight = (flight) => {
+  selectedFlight.value = flight;
+};
+
+const filter = ref({
+  from: "all",
+  to: "all",
+  sortBy: "default",
+  date: null,
+  flightNumber: null,
+});
+
+const applyFlightsFilter = () => {
+  isFiltered.value = true;
+  flights.value = [...schedules.value];
+
+  if (filter.value.from !== "all") {
+    flights.value = flights.value.filter(
+      (flight) => flight.Route.DepartureAirport.IATACode === filter.value.from
+    );
+  }
+
+  if (filter.value.to !== "all") {
+    flights.value = flights.value.filter(
+      (flight) => flight.Route.ArrivalAirport.IATACode === filter.value.to
+    );
+  }
+
+  if (filter.value.sortBy === "dateTime") {
+    flights.value = flights.value.sort((a, b) => {
+      return new Date(a.Date + " " + a.Time) - new Date(b.Date + " " + b.Time);
+    });
+  } else if (filter.value.sortBy === "economyPrices") {
+    flights.value = flights.value.sort((a, b) => {
+      return a.EconomyPrice - b.EconomyPrice;
+    });
+  } else if (filter.value.sortBy === "approved") {
+    flights.value = flights.value.filter((flight) => flight.Confirmed);
+  }
+
+  if (filter.value.date) {
+    flights.value = flights.value.filter(
+      (flight) => flight.Date === filter.value.date
+    );
+  }
+
+  if (filter.value.flightNumber) {
+    flights.value = flights.value.filter(
+      (flight) => flight.FlightNumber === filter.value.flightNumber
+    );
+  }
+};
+
+const displayedFlights = computed(() =>
+  isFiltered.value ? flights.value : schedules.value
+);
+
+const applyFlightCancel = async (flight) => {
+  if (flight === null) {
+    addError("Error: Select flight first!");
+    return;
+  }
+  cancelFlight(flight.id);
+  await fetchNewData();
+  selectedFlight.value = null;
+};
+
+const editFlight = (flight) => {
+  editingFlightSchedule.value = flight;
+  if (editingFlightSchedule.value === null) {
+    addError("Error: Select flight first!");
+    return;
+  }
+  openEditFlightScheduleModal();
+};
+
+const openEditFlightScheduleModal = () => {
+  isScheduleEditModalOpen.value = true;
+};
+
+const closeEditFlightScheduleModal = () => {
+  isScheduleEditModalOpen.value = false;
+  selectedFlight.value = null;
+};
+
+const openApplyScheduleChangesModal = () => {
+  isApplyScheduleChangesModalOpen.value = true;
+};
+
+const closeApplyScheduleChangesModal = () => {
+  isApplyScheduleChangesModalOpen.value = false;
+};
+
+const formatPrice = (price) => {
+  if (price) {
+    return "$" + Math.floor(price);
+  } else {
+    return null;
+  }
+};
+
+const fetchNewData = async () => {
+  schedules.value = await getAllSchedules();
+  schedules.value = await getAllSchedules();
+  applyFlightsFilter();
+};
+
+onMounted(async () => {
+  schedules.value = allSchedules.value.length
+    ? allSchedules.value
+    : await getAllSchedules();
+
+  airports.value = allAirports.value.length
+    ? allAirports.value
+    : await getAllAirports();
+});
+</script>
+
 <template>
   <UIHeader title="Manage Flight Schedules" />
   <UINav />
@@ -6,39 +155,48 @@
       <legend>Filter by</legend>
       <label class="field">
         <span class="label">From</span>
-        <UISelect required>
-          <option value="" disabled selected>[ Airport list ]</option>
-          <option value="SFO">San Francisco International</option>
-          <option value="LAX">Los Angeles International</option>
-          <option value="JFK">John F. Kennedy International</option>
+        <UISelect v-model="filter.from" required>
+          <option value="all" selected>All</option>
+          <option v-for="airport in airports" :value="airport.IATACode">
+            {{ airport.Name }}
+          </option>
         </UISelect>
       </label>
       <label class="field">
         <span class="label">Outbound</span>
-        <input class="input" type="date" />
+        <input v-model="filter.date" class="input" type="date" />
       </label>
       <label class="field">
         <span class="label">To</span>
-        <UISelect required>
-          <option value="" disabled selected>[ Airport list ]</option>
-          <option value="SFO">San Francisco International</option>
-          <option value="LAX">Los Angeles International</option>
-          <option value="JFK">John F. Kennedy International</option>
+        <UISelect v-model="filter.to" required>
+          <option value="all" selected>All</option>
+          <option v-for="airport in airports" :value="airport.IATACode">
+            {{ airport.Name }}
+          </option>
         </UISelect>
       </label>
       <label class="field">
         <span class="label">Flight Number</span>
-        <input class="input" type="text" placeholder="[ XX0000 ]" />
+        <input
+          class="input"
+          v-model="filter.flightNumber"
+          type="number"
+          min="0"
+          placeholder="Enter flight number"
+        />
       </label>
       <label class="field">
         <span class="label">Sort by</span>
-        <UISelect requited>
-          <option value="">Date-Time</option>
-          <option value="">Economy Class Prices</option>
-          <option value="">Approved</option>
+        <UISelect v-model="filter.sortBy" requited>
+          <option value="default" selected>Default</option>
+          <option value="dateTime">Date-Time</option>
+          <option value="economyPrices">Economy Class Prices</option>
+          <option value="approved">Approved</option>
         </UISelect>
       </label>
-      <UIButton class="apply-button">Apply</UIButton>
+      <UIButton @click="applyFlightsFilter" class="apply-button"
+        >Apply</UIButton
+      >
     </fieldset>
     <div class="table-wrapper">
       <table class="table">
@@ -57,30 +215,30 @@
         </thead>
         <tbody>
           <tr
-            v-for="flight in flights"
+            v-for="flight in displayedFlights"
             :key="flight.id"
             @click="selectFlight(flight)"
             :class="{
               selected: flight === selectedFlight,
-              canceled: flight.status === 'canceled',
+              canceled: !flight.Confirmed,
               row: true,
             }"
           >
-            <td>{{ flight.date }}</td>
-            <td>{{ flight.time }}</td>
-            <td>{{ flight.fromAirport.code }}</td>
-            <td>{{ flight.toAirport.code }}</td>
-            <td>{{ flight.flightNumber }}</td>
-            <td>{{ flight.aircraft }}</td>
-            <td>{{ flight.economyClassPrice }}</td>
-            <td>{{ flight.businessClassPrice }}</td>
-            <td>{{ flight.firstClassPrice }}</td>
+            <td>{{ flight?.Date ?? "–" }}</td>
+            <td>{{ flight?.Time ?? "–" }}</td>
+            <td>{{ flight?.Route?.DepartureAirport?.IATACode ?? "–" }}</td>
+            <td>{{ flight?.Route?.ArrivalAirport?.IATACode ?? "–" }}</td>
+            <td>{{ flight?.FlightNumber ?? "–" }}</td>
+            <td>{{ flight?.Aircraft?.Name ?? "–" }}</td>
+            <td>{{ formatPrice(flight.EconomyPrice) ?? "–" }}</td>
+            <td>{{ formatPrice(flight.EconomyPrice * 1.35) ?? "–" }}</td>
+            <td>{{ formatPrice(flight.EconomyPrice * 1.35 * 1.3) ?? "–" }}</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="buttons">
-      <UIButton @click="cancelFlight(selectedFlight)">
+      <UIButton @click="applyFlightCancel(selectedFlight)">
         <img
           src="https://bayrivercolleges.ca/files/logo-x-twitter.svg"
           alt="Cross icon"
@@ -89,7 +247,7 @@
         />
         <span>Cancel Flight</span>
       </UIButton>
-      <UIButton @click="openEditFlightScheduleModal">
+      <UIButton @click="editFlight(selectedFlight)">
         <img
           src="https://cdn-icons-png.flaticon.com/512/7398/7398464.png"
           width="25"
@@ -108,6 +266,8 @@
     </div>
   </main>
   <ScheduleEditModal
+    @updateData="fetchNewData"
+    :flight="editingFlightSchedule"
     :open="isScheduleEditModalOpen"
     @close="closeEditFlightScheduleModal"
   />
@@ -117,97 +277,13 @@
   />
 </template>
 
-<script setup>
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-import UISelect from "@/components/UISelect.vue";
-import UINav from "@/components/UINav.vue";
-import ScheduleEditModal from "@/components/ScheduleEditModal.vue";
-import ApplyScheduleChangesModal from "@/components/ApplyScheduleChangesModal.vue";
-import { ref } from "vue";
-
-const isApplyScheduleChangesModalOpen = ref(false);
-const isScheduleEditModalOpen = ref(false);
-const selectedFlight = ref(null);
-const editingFlightSchedule = ref(null);
-
-const airports = ref([]);
-const flights = ref([]);
-const filteredFlights = ref([]);
-
-const filter = ref({
-  from: "",
-  to: "",
-  sortBy: "date_time",
-  date: "",
-  flightNumber: "",
-});
-
-const apiUrl = "src/data/flights.json";
-const fetchFlights = async () => {
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    flights.value = data;
-  } catch (error) {
-    console.error("Error fetching flights:", error);
-  }
-};
-
-const users = ref([]);
-
-const selectFlight = (flight) => {
-  selectedFlight.value = flight;
-};
-
-function applyFilter() {
-  filteredFlights.value = flights.value.filter((flight) => {
-    return (
-      (filter.value.from === "" ||
-        flight.fromAirport.code === filter.value.from) &&
-      (filter.value.to === "" || flight.toAirport.code === filter.value.to) &&
-      (filter.value.date === "" || flight.date === filter.value.date) &&
-      (filter.value.flightNumber === "" ||
-        flight.flightNumber.includes(filter.value.flightNumber))
-    );
-  });
-}
-
-const cancelFlight = (flight) => {
-  // TODO: Implement flight canceling
-};
-
-const openEditFlightScheduleModal = () => {
-  isScheduleEditModalOpen.value = true;
-};
-
-const closeEditFlightScheduleModal = () => {
-  isScheduleEditModalOpen.value = false;
-};
-
-const editFlightSchedule = (selectedFlight) => {
-  editingFlightSchedule.value = selectedFlight;
-  openEditFlightScheduleModal();
-};
-
-const openApplyScheduleChangesModal = () => {
-  isApplyScheduleChangesModalOpen.value = true;
-};
-
-const closeApplyScheduleChangesModal = () => {
-  isApplyScheduleChangesModalOpen.value = false;
-};
-
-fetchFlights();
-</script>
-
 <style scoped>
 .main {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 1.8rem);
   padding: 1rem;
   gap: 1rem;
+  flex-grow: 0;
 }
 .manage-flight-schedules {
   width: 100%;
@@ -269,5 +345,9 @@ th {
 
 .selected {
   box-shadow: inset 0 0 0 2px black;
+}
+
+.canceled {
+  background-color: salmon;
 }
 </style>

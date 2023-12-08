@@ -76,7 +76,6 @@ function applyFilter() {
 .main {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 1.8rem);
   padding: 1rem;
   gap: 1rem;
 }

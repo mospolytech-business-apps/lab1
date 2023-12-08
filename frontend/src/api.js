@@ -17,7 +17,7 @@ export const api = {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(`☠️ ${data.error} (${response.status}) `);
+        throw new Error(`${data.error} (${response.status}) `);
       }
 
       return { res: data, err: null };
@@ -222,7 +222,7 @@ export const api = {
   },
 
   // schedules
-  schedules: async ({ accessToken }) => {
+  getAllSchedules: async ({ accessToken }) => {
     try {
       const response = await fetch(`${BACKEND_URL}/schedules/`, {
         method: "GET",
@@ -241,10 +241,10 @@ export const api = {
     }
   },
 
-  cancelSchedule: async ({ accessToken, id }) => {
+  cancelFlight: async ({ accessToken, id }) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/schedules/${id}/`, {
-        method: "PATCH",
+      const response = await fetch(`${BACKEND_URL}/schedules/cancel/${id}/`, {
+        method: "POST",
         headers: {
           ...headers,
           Authorization: `Bearer ${accessToken}`,
@@ -264,7 +264,7 @@ export const api = {
     }
   },
 
-  updateSchedule: async ({ accessToken, id, Date, Time, EconomyPrice }) => {
+  updateFlight: async ({ accessToken, id, ...payload }) => {
     try {
       const response = await fetch(`${BACKEND_URL}/schedules/${id}/`, {
         method: "PATCH",
@@ -272,7 +272,7 @@ export const api = {
           ...headers,
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ Date, Time, EconomyPrice }),
+        body: JSON.stringify(payload[0]),
       });
 
       if (!response.ok) {
@@ -289,10 +289,9 @@ export const api = {
 
   importSchedules: async ({ accessToken, formData }) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/schedules/import/`, {
+      const response = await fetch(`${BACKEND_URL}/schedules/import-csv/`, {
         method: "POST",
         headers: {
-          ...headers,
           Authorization: `Bearer ${accessToken}`,
         },
         body: formData,
@@ -311,11 +310,11 @@ export const api = {
   },
 
   // airports
-  airports: async ({ accessToken }) => {
+  getAllAirports: async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/airport/`, {
+      const response = await fetch(`${BACKEND_URL}/airports/`, {
         method: "GET",
-        headers: { ...headers, Authorization: `Bearer ${accessToken}` },
+        headers: { ...headers },
       });
 
       if (!response.ok) {

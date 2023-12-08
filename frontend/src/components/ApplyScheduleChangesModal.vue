@@ -1,3 +1,41 @@
+<script setup>
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import Cookies from "js-cookie";
+
+import { ref } from "vue";
+import { useSchedulesStore } from "@/stores/schedules.store";
+import { useErrorsStore } from "@/stores/errors.store";
+const { importCSV } = useSchedulesStore();
+const { addError } = useErrorsStore();
+
+const importStatistics = ref(null);
+
+const props = defineProps({
+  open: { type: Boolean, required: true },
+});
+const emit = defineEmits(["close"]);
+
+const fileInput = ref(null);
+
+const importData = async () => {
+  if (fileInput.value.files.length > 0) {
+    const file = fileInput.value.files[0];
+
+    const formData = new FormData();
+    formData.append("file", file, file.name);
+
+    importStatistics.value = await importCSV(formData);
+  } else {
+    addError("No file selected");
+  }
+};
+
+const close = () => {
+  emit("close");
+};
+</script>
+
 <template>
   <div v-if="props.open" class="modal">
     <UIHeader title="Apply Schedule Changes" :closeButtonHandler="close" />
@@ -21,66 +59,19 @@
         <p>Success Changes Applied:</p>
         <p>Duplicate Records Discarded:</p>
         <p>Records with missing fields discarded:</p>
-        <p>[XXX]</p>
-        <p>[XXX]</p>
-        <p>[XXX]</p>
+        <p>
+          <b>{{ importStatistics?.success_count ?? "–" }}</b>
+        </p>
+        <p>
+          <b>{{ importStatistics?.duplicate_count ?? "–" }}</b>
+        </p>
+        <p>
+          <b>{{ importStatistics?.missing_fields_count ?? "–" }}</b>
+        </p>
       </fieldset>
     </main>
   </div>
 </template>
-
-<script setup>
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-import { ref } from "vue";
-
-const props = defineProps({
-  open: { type: Boolean, required: true },
-});
-const emit = defineEmits(["close"]);
-
-const fileInput = ref(null);
-
-const close = () => {
-  emit("close");
-};
-
-const importData = async () => {
-  console.log("Importing data");
-  console.log(fileInput.value.files.length);
-
-  if (fileInput.value.files.length > 0) {
-    const file = fileInput.value.files[0];
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/schedules/import-csv/",
-        {
-          method: "POST",
-          headers: {
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzAxNDI4MjcwLCJpYXQiOjE3MDEzNDE4NzAsImp0aSI6ImY0MzBiYzE0M2FkZTRlYjJiYWVlYzQ1ZWRkMzhiYjViIiwidXNlcl9pZCI6MTB9.EjLzblGVhmLClWIoClb_vUj7qPLgICG2GjqqZ2Hgux0",
-          },
-          body: formData,
-        }
-      );
-
-      if (response.ok) {
-        console.log("File uploaded successfully");
-      } else {
-        console.error("File upload failed");
-      }
-    } catch (error) {
-      console.error("Error during fetch:", error);
-    }
-  } else {
-    console.log("No file selected");
-  }
-};
-</script>
 
 <style scoped>
 .modal {
@@ -109,7 +100,11 @@ const importData = async () => {
 }
 
 .summary > * {
+  display: block;
   margin-top: 0.5rem;
+  &:first-of-type {
+    margin-top: 0;
+  }
 }
 
 .field {

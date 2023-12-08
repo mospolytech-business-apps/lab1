@@ -17,11 +17,63 @@ from airoutes.serializers import RouteSerializer
 from schedules.models import Schedule
 from schedules.admin import ScheduleResource
 from schedules.serializers import ScheduleSerializer
+from rest_framework.exceptions import NotFound
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     serializer_class = ScheduleSerializer
     queryset = Schedule.objects.all()
+
+    @action(
+        methods=["PATCH"],
+        detail=False,
+        permission_classes=[IsAdminUser],
+        url_path="(?P<id>\d+)",
+    )
+    def update_flight(self, request, id):
+        try:
+            schedule = Schedule.objects.get(id=id)
+        except Schedule.DoesNotExist:
+            raise NotFound({"error": "Flight with this id was not found"})
+
+        date = request.data.get("date")
+        time = request.data.get("time")
+        price = request.data.get("economyPrice")
+
+        if not (date or time or price):
+            return Response(
+                {"message": "No data provided"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if date:
+            setattr(schedule, "Date", date)
+        if time:
+            setattr(schedule, "Time", time)
+        if price:
+            setattr(schedule, "EconomyPrice", price)
+
+        schedule.save()
+
+        return Response(
+            {"message": "Flight updated successfully"}, status=status.HTTP_200_OK
+        )
+
+    @action(
+        methods=["POST"],
+        detail=False,
+        permission_classes=[IsAdminUser],
+        url_path="cancel/(?P<id>\d+)",
+    )
+    def cancel_flight(self, request, id):
+        try:
+            schedule = Schedule.objects.get(id=id)
+        except Schedule.DoesNotExist:
+            raise NotFound({"error": "Flight with this id was not found"})
+
+        setattr(schedule, "Confirmed", 0)
+        schedule.save()
+
+        return Response({"message": "Canceled successfully"})
 
     @action(
         methods=["POST"],

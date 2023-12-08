@@ -5,6 +5,25 @@
 GET {{BACKEND_URL}}/schedules/
 Content-Type: application/json
 
+### Update flight
+# @ref login 
+PATCH {{BACKEND_URL}}/schedules/1/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+{
+    "date": "2023-01-01",
+    "time": "12:00:00",
+    "price": 2000.00
+}
+
+
+### Cancel flight
+# @ref login 
+POST {{BACKEND_URL}}/schedules/cancel/2/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+
 
 ### Import schedules
 # @ref login 

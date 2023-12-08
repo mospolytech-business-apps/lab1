@@ -19,6 +19,7 @@ class ScheduleAdmin(ImportExportModelAdmin):
         "FlightNumber",
         "aircraft_code",
         "route_info",
+        "EconomyPrice",
         "Confirmed",
     )
     list_display_links = (
@@ -28,6 +29,7 @@ class ScheduleAdmin(ImportExportModelAdmin):
         "FlightNumber",
         "route_info",
         "aircraft_code",
+        "EconomyPrice",
         "Confirmed",
     )
 

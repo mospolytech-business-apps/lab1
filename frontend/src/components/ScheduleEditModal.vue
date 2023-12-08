@@ -1,29 +1,87 @@
+<script setup>
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+
+import { ref, watch, onMounted } from "vue";
+import { useSchedulesStore } from "@/stores/schedules.store";
+const { updateFlight } = useSchedulesStore();
+
+const props = defineProps({
+  open: { type: Boolean, required: true },
+  flight: { type: Object, required: true },
+});
+
+const emit = defineEmits(["close", "updateData"]);
+
+const date = ref(null);
+const time = ref(null);
+const economyPrice = ref(null);
+
+watch(
+  () => props.flight,
+  (newVal) => {
+    if (newVal) {
+      date.value = newVal.Date;
+      time.value = newVal.Time;
+      economyPrice.value = newVal.EconomyPrice;
+    }
+  },
+  { immediate: true }
+);
+
+const applyFlightChanges = () => {
+  console.log(props.flight);
+  const payload = {
+    date: date.value,
+    time: time.value,
+    economyPrice: economyPrice.value,
+  };
+  console.log(payload);
+  updateFlight(props.flight.id, payload);
+  emit("updateData");
+  date.value = null;
+  time.value = null;
+  economyPrice.value = null;
+  emit("close");
+};
+
+const cancel = () => {
+  emit("close");
+};
+</script>
+
 <template>
   <div v-if="props.open" class="modal">
     <UIHeader title="Schedule edit" :closeButtonHandler="cancel" />
     <main class="main">
       <fieldset class="info">
         <legend>Flight route</legend>
-        <p>From: <b>AUH</b></p>
-        <p>To: <b>ADE</b></p>
-        <p>Aircraft: <b>Boeing 739</b></p>
+        <p>
+          From: <b>{{ props.flight.Route.DepartureAirport.IATACode }}</b>
+        </p>
+        <p>
+          To: <b>{{ props.flight.Route.ArrivalAirport.IATACode }}</b>
+        </p>
+        <p>
+          Aircraft: <b>{{ props.flight.Aircraft.Name }}</b>
+        </p>
       </fieldset>
       <div class="inputs">
         <label class="field">
           <span class="label">Date: </span>
-          <input class="input" type="date" />
+          <input v-model="date" class="input" type="date" />
         </label>
         <label class="field">
           <span class="label">Time: </span>
-          <input class="input" type="time" />
+          <input v-model="time" class="input" type="time" />
         </label>
         <label class="field">
           <span class="label">Economy price: $ </span>
-          <input class="input price-input" type="text" />
+          <input v-model="economyPrice" class="input price-input" type="text" />
         </label>
       </div>
       <div class="buttons">
-        <UIButton @click="update" type="button" id="saveSchedule">
+        <UIButton @click="applyFlightChanges" type="button" id="saveSchedule">
           Update
         </UIButton>
         <UIButton
@@ -38,27 +96,6 @@
     </main>
   </div>
 </template>
-
-<script setup>
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-
-const props = defineProps({
-  open: { type: Boolean, required: true },
-});
-
-const emit = defineEmits(["close"]);
-
-const cancel = () => {
-  emit("close");
-};
-
-const update = () => {
-  // TODO: implement updae logic
-  alert("Schedule updated");
-  emit("close");
-};
-</script>
 
 <style scoped>
 .modal {
