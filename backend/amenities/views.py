@@ -152,6 +152,14 @@ class AmenityViewSet(viewsets.ModelViewSet):
 
         average_duration = total_duration / len(confirmed_tickets)
 
+        # Calculate busiest and least busy days
+        flight_counts_by_day = Schedule.objects.filter(
+            Date__in=confirmed_tickets.values("schedule__Date")
+        ).values("Date").annotate(total_flights=Count("id")).order_by("-total_flights")
+
+        busiest_day = flight_counts_by_day.first()
+        least_busy_day = flight_counts_by_day.last()
+
         # Общий результат
         result = {
             "amenities": {"amenities": list(amenities_data)},
@@ -160,8 +168,10 @@ class AmenityViewSet(viewsets.ModelViewSet):
             "flight_counts": {
                 "confirmed_flights_count": confirmed_flights_count,
                 "canceled_flights_count": canceled_flights_count,
+                "average_flight_duration": str(average_duration),
+                "busiest_day": busiest_day["Date"] if busiest_day else None,
+                "least_busy_day": least_busy_day["Date"] if least_busy_day else None,
             },
-            "average_flight_duration": str(average_duration),
         }
 
         return Response(result)
