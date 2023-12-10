@@ -145,6 +145,51 @@ class AmenityViewSet(viewsets.ModelViewSet):
 
         return Response(result)
 
+
+    
+    @action(methods=["POST"], detail=False, url_path="issue-ticket")
+    def confirm_booking(self, request):
+        user_id = request.data.get("user")
+        schedule_id = request.data.get("schedule")
+        cabin_type = request.data.get("cabin_type")
+        first_name = request.data.get("first_name")
+        last_name = request.data.get("last_name")
+        email = request.data.get("email")
+        phone = request.data.get("phone")
+        passport_number = request.data.get("passport_number")
+        passport_country_id = request.data.get("passport_country_id")
+        booking_reference = request.data.get("booking_reference")
+        confirmed = request.data.get("confirmed")
+
+        try:
+            user = User.objects.get(id=user_id)
+            schedule = Schedule.objects.get(id=schedule_id)
+
+
+            # Создать новый объект билета
+            ticket = Ticket.objects.create(
+                user=user,
+                schedule=schedule,
+                cabin_type=cabin_type,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone=phone,
+                passport_number=passport_number,
+                passport_country_id=passport_country_id,
+                booking_reference=booking_reference,
+                confirmed=confirmed,
+            )
+
+            # Сериализовать билет и вернуть ответ
+            serializer = TicketSerializer(ticket)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except ObjectDoesNotExist as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     @action(detail=False, url_path="amenities-tickets")
     def amenities_tickets(self, request):
         items = AmenityTicket.objects.all()
