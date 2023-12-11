@@ -4,7 +4,7 @@ import router from "@/router";
 import UIHeader from "@/components/UIHeader.vue";
 import { useAuthStore } from "@/stores/auth.store";
 
-const { login } = useAuthStore();
+const { login, logout } = useAuthStore();
 
 const username = ref("");
 const password = ref("");
@@ -14,10 +14,6 @@ const usernameInput = ref(null);
 onMounted(() => {
   usernameInput.value.focus();
 });
-
-const openExit = () => {
-  popup.value?.show();
-};
 </script>
 
 <template>
@@ -40,7 +36,7 @@ const openExit = () => {
       </label>
       <div class="buttons">
         <button class="btn" type="submit">Login</button>
-        <button class="btn" @click="openExit" type="reset">Exit</button>
+        <button class="btn" @click="logout()" type="reset">Exit</button>
       </div>
     </form>
   </main>

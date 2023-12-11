@@ -1,23 +1,26 @@
 <script setup>
 import UIHeader from "@/components/UIHeader.vue";
 import UIButton from "@/components/UIButton.vue";
+import { ref } from "vue";
 
 const props = defineProps({
   open: { type: Boolean, required: true, default: true },
+  failedSession: { type: Object, required: true },
 });
 
 const close = () => {
   emit("close");
 };
 
-const emit = defineEmits(["close", "submit"]);
+const reason = ref("");
 
-let logoutReason = "";
-let additionalInformation = "";
+const emit = defineEmits(["close", "updateReason"]);
 
-async function submitForm() {
-  // TODO: submit form
-}
+const closeModal = () => {
+  if (!reason.value) return;
+  emit("updateReason", reason.value);
+  emit("close");
+};
 </script>
 
 <template>
@@ -25,25 +28,31 @@ async function submitForm() {
     <UIHeader :title="props.title" :closeButtonHandler="close" />
     <main class="main">
       <h1 class="title">
-        No logout detected on your last login on 06/06/2021 at 12:00
+        No logout detected on your last login on
+        {{ props.failedSession.date }} at {{ props.failedSession.loginTime }}
       </h1>
       <p>Reason:</p>
-      <textarea
-        class="textarea"
-        name="additionalInformation"
-        id="additionalInformation"
-        v-model="additionalInformation"
-      />
+      <textarea class="textarea" />
       <div class="bottom-row">
         <label class="label">
-          <input type="radio" name="reason" />
+          <input
+            v-model="reason"
+            value="Software crash"
+            type="radio"
+            name="reason"
+          />
           <span class="reason">Software crash</span>
         </label>
         <label class="label">
-          <input type="radio" name="reason" />
+          <input
+            v-model="reason"
+            value="System crash"
+            type="radio"
+            name="reason"
+          />
           <span class="reason">System crash</span>
         </label>
-        <UIButton class="btn" @click="submitForm">Confirm</UIButton>
+        <UIButton class="btn" @click="closeModal">Confirm</UIButton>
       </div>
     </main>
   </div>

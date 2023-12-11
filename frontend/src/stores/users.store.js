@@ -8,10 +8,9 @@ export const useUsersStore = defineStore("users", () => {
   const { addError } = useErrorsStore();
 
   const currentUser = ref({});
-  const userRole = ref("admin");
   const allUsers = ref([]);
 
-  const isLogoutModalOpen = ref(false);
+  const userRole = ref(null);
 
   const getAllUsers = async () => {
     const { res, err } = await api.getAllUsers({
@@ -111,16 +110,32 @@ export const useUsersStore = defineStore("users", () => {
     return status;
   };
 
+  const sendLogoutInformation = async (reason, loginTime) => {
+    const { status, err } = await api.sendLogoutInformation({
+      accessToken: Cookies.get("ACCESS_TOKEN"),
+      id: currentUser.value.id,
+      reason,
+      loginTime,
+    });
+
+    if (err !== null) {
+      addError(err.message);
+      return;
+    }
+
+    return status;
+  };
+
   return {
     allUsers,
     currentUser,
     userRole,
-    isLogoutModalOpen,
     getUser,
     editUser,
     addUser,
     getAllUsers,
     ban,
     unban,
+    sendLogoutInformation,
   };
 });

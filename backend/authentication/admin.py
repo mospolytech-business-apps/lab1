@@ -1,8 +1,12 @@
 from django.contrib import admin
 from authentication.models import User
+from django.contrib.auth.forms import UserChangeForm, AdminPasswordChangeForm
 
 
 class UserAdmin(admin.ModelAdmin):
+    form = UserChangeForm
+    change_password_form = AdminPasswordChangeForm
+
     list_display = (
         "id",
         "email",

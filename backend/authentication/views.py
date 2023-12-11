@@ -10,6 +10,8 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 from authentication.models import User
 from authentication.serializers import UserSerializer
 from office.models import Office
+from jose import jwt
+from core.settings import SECRET_KEY
 
 
 class ListViewPermission(BasePermission):
@@ -33,6 +35,46 @@ class AuthenticationViewSet(ModelViewSet):
             api[name] = self.reverse_action(url)
 
         return Response(api)
+
+    @action(
+        methods=["GET"],
+        detail=True,
+        permission_classes=[IsAdminUser],
+        url_path=r"password",
+    )
+    def get_user(self, request, id):
+        user = User.objects.get(id=id)
+
+        data = UserSerializer(user).data
+
+        return Response(data)
+
+    @action(
+        methods=["GET"],
+        detail=False,
+        url_path="me",
+        permission_classes=[IsAuthenticated],
+    )
+    def me(self, request):
+        access_token = request.headers.get("Authorization").split(" ")[1]
+
+        secret_key = SECRET_KEY
+
+        try:
+            decoded_token = jwt.decode(
+                access_token, key=secret_key, algorithms=["HS256"]
+            )
+
+            user_id = decoded_token["user_id"]
+
+            user = User.objects.get(id=user_id)
+
+            data = self.serializer_class(user).data
+            return Response(data)
+        except jwt.ExpiredSignatureError:
+            return Response({"error": "Token has expired"}, status=401)
+        except jwt.JWTError:
+            return Response({"error": "Invalid token"}, status=401)
 
     @action(
         methods=["POST"], detail=False, url_path="login", permission_classes=[AllowAny]
@@ -76,18 +118,6 @@ class AuthenticationViewSet(ModelViewSet):
         response.data = {"access": str(refresh.access_token), "data": data}
 
         return response
-
-    @action(
-        methods=["GET"],
-        detail=False,
-        permission_classes=[IsAuthenticated],
-        url_path="me",
-    )
-    def me(self, request):
-        user = request.user
-        data = self.serializer_class(user).data
-
-        return Response(data)
 
     @action(
         methods=["POST"],
@@ -190,19 +220,6 @@ class UserViewSet(ModelViewSet):
         return Response(data)
 
     @action(
-        methods=["GET"],
-        detail=False,
-        permission_classes=[IsAdminUser],
-        url_path=r"(?P<id>.*)",
-    )
-    def get_user(self, request, id):
-        user = User.objects.get(id=id)
-
-        data = UserSerializer(user).data
-
-        return Response(data)
-
-    @action(
         methods=["POST"], detail=False, url_path="add", permission_classes=[IsAdminUser]
     )
     def add_user(self, request):
@@ -269,3 +286,31 @@ class UserViewSet(ModelViewSet):
         user.save()
 
         return Response({"message": "Login enabled"})
+
+    @action(
+        methods=["PUT"],
+        detail=False,
+        permission_classes=[IsAuthenticated],
+        url_path="change-logout-info/(?P<id>\d+)",
+    )
+    def change_logout_info(self, request, id):
+        if not id:
+            return Response({"error": "Not user id provided"})
+        try:
+            user = User.objects.get(id=id)
+        except:
+            return Response({"error": "User with this id was not found"})
+
+        login_time = request.data.get("loginTime")
+        reason = request.data.get("reason")
+
+        if login_time is None:
+            return Response({"error": "loginTime is required"})
+        if reason is None:
+            return Response({"error": "reason is required"})
+
+        user.login_logout_times[login_time] = {"logout_time": None, "error": reason}
+
+        user.save()
+
+        return Response({"message": "Logout info changed"})

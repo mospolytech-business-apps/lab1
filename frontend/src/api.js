@@ -48,6 +48,25 @@ export const api = {
     }
   },
 
+  me: async ({ accessToken }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/auth/me/`, {
+        method: "GET",
+        headers: { ...headers, Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(`(${response.status}) User is not logged in`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
   // users
   getAllUsers: async ({ accessToken }) => {
     try {
@@ -170,6 +189,33 @@ export const api = {
 
       if (!response.ok) {
         throw new Error(`(${response.status}) Error unbanning the user`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      console.log(error);
+      return { res: null, err: error };
+    }
+  },
+
+  sendLogoutInformation: async ({ accessToken, id, reason, loginTime }) => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/users/change-logout-info/${id}/`,
+        {
+          method: "PUT",
+          headers: {
+            ...headers,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ reason, loginTime }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`(${response.status}) Error sending logout info`);
       }
 
       const data = await response.json();

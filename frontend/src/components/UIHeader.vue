@@ -10,7 +10,8 @@
 
 <script setup>
 import UIError from "@/components/UIError.vue";
-import reload from "@/scripts/reload.js";
+import { useAuthStore } from "../stores/auth.store";
+
 const props = defineProps({
   title: {
     type: String,
@@ -19,7 +20,10 @@ const props = defineProps({
   closeButtonHandler: {
     type: Function,
     required: false,
-    default: reload,
+    default: async () => {
+      const { logout } = useAuthStore();
+      logout();
+    },
   },
 });
 </script>

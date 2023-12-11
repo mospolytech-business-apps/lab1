@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useUsersStore } from "@/stores/users.store";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "@/stores/auth.store";
 
 import AdminHomePage from "@/pages/AdminHomePage.vue";
 import ClientSurveyPage from "@/pages/ClientSurveyPage.vue";
@@ -78,31 +80,35 @@ const accessList = {
   user: ["/", "/search-flights", "/purchase-amenities", "/client-survey"],
 };
 
-router.beforeEach((to, from, next) => {
-  let nextCalled = false;
+router.beforeEach(async (to, from, next) => {
+  const { me } = useAuthStore();
+  const { userRole } = storeToRefs(useUsersStore());
 
-  const userRole = useUsersStore().userRole;
+  const user = await me();
 
-  const redirect = () => {
-    if (nextCalled) {
+  userRole.value = user ? (user.isAdmin ? "admin" : "user") : null;
+
+  if (userRole.value === null && to.path !== "/login") {
+    next("/login");
+    return;
+  }
+
+  if (userRole.value !== null && to.path === "/login") {
+    next("/");
+    return;
+  }
+
+  if (userRole.value !== null) {
+    if (accessList[userRole.value].includes(to.path)) {
+      next();
       return;
     }
 
-    nextCalled = true;
-    next();
-  };
-
-  if (!userRole && to.path !== "/login") {
-    next("/login");
-  } else if (
-    userRole &&
-    !accessList[userRole].includes(to.path) &&
-    to.path !== "/404"
-  ) {
     next("/");
-  } else {
-    redirect();
+    return;
   }
+
+  next();
 });
 
 export default router;

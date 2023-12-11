@@ -2,6 +2,11 @@
   <div class="wrapper">
     <RouterView />
   </div>
+  <dialog ref="dialog" id="dialog">
+    <p>Are you sure you want to leave?</p>
+    <button @click="showDialog = false">No</button>
+    <button @click="logout()">Yes</button>
+  </dialog>
 </template>
 
 <script setup>

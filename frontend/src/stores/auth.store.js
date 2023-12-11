@@ -3,6 +3,7 @@ import { api } from "@/api";
 import { useErrorsStore } from "@/stores/errors.store";
 import { useUsersStore } from "@/stores/users.store";
 import router from "@/router";
+import { ref } from "vue";
 
 import Cookies from "js-cookie";
 
@@ -21,8 +22,6 @@ export const useAuthStore = defineStore("auth", () => {
       return;
     }
 
-    console.log(res.data);
-
     currentUser.value = {
       id: res.data.id,
       office: res.data.office,
@@ -37,8 +36,6 @@ export const useAuthStore = defineStore("auth", () => {
       login_logout_times: res.data.login_logout_times,
     };
 
-    console.log(currentUser.value);
-
     userRole.value = currentUser.value.isAdmin ? "admin" : "user";
 
     Cookies.set("ACCESS_TOKEN", res.access);
@@ -46,17 +43,50 @@ export const useAuthStore = defineStore("auth", () => {
     router.push("/");
   };
 
-  const logout = async ({ token, error }) =>
-    fetch(`${BACKEND_URL}/auth/logout/`, {
-      method: "POST",
-      headers: {
-        ...headers,
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ error }),
-    }).then((res) => res.json());
+  const logout = async () => {
+    if (confirm("Are you sure you want to log out?")) {
+      const _ = await api.logout({
+        accessToken: Cookies.get("ACCESS_TOKEN"),
+      });
+
+      currentUser.value = null;
+      userRole.value = null;
+
+      Cookies.remove("ACCESS_TOKEN");
+
+      window.location.href = "about:blank";
+    }
+  };
+
+  const me = async () => {
+    const { res, err } = await api.me({
+      accessToken: Cookies.get("ACCESS_TOKEN"),
+    });
+
+    if (err !== null) {
+      userRole.value = null;
+      return userRole.value;
+    }
+
+    currentUser.value = {
+      id: res.id,
+      office: res.office,
+      role: res.role,
+      lastLogin: res.last_login,
+      username: res.email,
+      firstName: res.first_name,
+      lastName: res.last_name,
+      birthday: res.birthday,
+      isAdmin: res.is_superuser,
+      isActive: res.is_active,
+      login_logout_times: res.login_logout_times,
+    };
+
+    return currentUser.value;
+  };
 
   return {
+    me,
     login,
     logout,
   };

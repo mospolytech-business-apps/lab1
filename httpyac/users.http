@@ -63,3 +63,14 @@ Authorization: Bearer {{login.access}}
 PUT {{BACKEND_URL}}/users/unban/{{testuser.id}}/
 Content-Type: application/json
 Authorization: Bearer {{login.access}}
+
+### Cange logout reason
+# @ref login
+PUT {{BACKEND_URL}}/users/change-logout-info/1/
+Content-Type: application/json
+Authorization: Bearer {{login.access}}
+
+{
+    "loginTime": "2023-12-11T13:19:42.257549+00:00",
+    "reason": "Power outage"
+}
