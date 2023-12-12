@@ -374,4 +374,57 @@ export const api = {
       return { res: null, err: error };
     }
   },
+
+  // tickets
+  searchForTickets: async (accessToken, payload) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/tickets/search/`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          from_airport: payload.from,
+          to_airport: payload.to,
+          cabin_type: payload.cabinType,
+          outbound_date: payload.outboundDate,
+          return_date: payload.returnDate,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  issueTicket: async (accessToken, payload) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/tickets/`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: payload,
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
 };

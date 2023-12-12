@@ -22,23 +22,23 @@
         <legend>Passenger details</legend>
         <label class="field">
           <span class="label">Firstname</span>
-          <input class="input" type="text" />
+          <input class="input" type="text" required />
         </label>
         <label class="field">
           <span class="label">Lastname</span>
-          <input class="input" type="text" />
+          <input class="input" type="text" required />
         </label>
         <label class="field">
           <span class="label">Birthdate</span>
-          <input class="input" type="date" />
+          <input class="input" type="date" required />
         </label>
         <label class="field">
           <span class="label">Passport number</span>
-          <input class="input" type="text" />
+          <input class="input" type="text" required />
         </label>
         <label class="field">
           <span class="label">Passport country</span>
-          <UISelect class="input" placeholder=" ">
+          <UISelect class="input" placeholder=" " required>
             <option value="russia">Russia</option>
           </UISelect>
         </label>

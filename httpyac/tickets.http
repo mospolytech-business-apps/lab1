@@ -13,10 +13,44 @@ Content-Type: application/json
   "from_airport": "BAH",
   "to_airport": "AUH",
   "cabin_type": "economy",
-  "outbound_date": "2017-10-04"
+  "outbound_date": "2017-10-07",
+  "return_date": "2017-10-09",
+  "wide_search": true 
 }
 
-### Issue ticket
+/*
+{
+  "outbound": [
+    {
+      "id": 8,
+      "from": "BAH",
+      "to": "AUH",
+      "date": "2017-10-07",
+      "time": "21:09:00",
+      "flight_numbers": [
+        50
+      ],
+      "base_price": 405
+    }
+  ],
+  "return": [
+    {
+      "id": 11,
+      "from": "AUH",
+      "to": "BAH",
+      "date": "2017-10-09",
+      "time": "17:00:00",
+      "flight_numbers": [
+        49
+      ],
+      "base_price": 627
+    }
+  ]
+}
+*/
+
+
+### Issue ticket 
 POST {{BACKEND_URL}}/tickets/
 Content-Type: application/json
 
