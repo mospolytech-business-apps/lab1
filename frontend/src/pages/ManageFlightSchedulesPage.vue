@@ -157,8 +157,11 @@ onMounted(async () => {
         <span class="label">From</span>
         <UISelect v-model="filter.from" required>
           <option value="all" selected>All</option>
-          <option v-for="airport in airports" :value="airport.IATACode">
-            {{ airport.Name }}
+          <option
+            v-for="airport in airports.filter((a) => a.IATACode !== filter.to)"
+            :value="airport.IATACode"
+          >
+            {{ airport.IATACode }}
           </option>
         </UISelect>
       </label>
@@ -170,8 +173,13 @@ onMounted(async () => {
         <span class="label">To</span>
         <UISelect v-model="filter.to" required>
           <option value="all" selected>All</option>
-          <option v-for="airport in airports" :value="airport.IATACode">
-            {{ airport.Name }}
+          <option
+            v-for="airport in airports.filter(
+              (a) => a.IATACode !== filter.from
+            )"
+            :value="airport.IATACode"
+          >
+            {{ airport.IATACode }}
           </option>
         </UISelect>
       </label>
