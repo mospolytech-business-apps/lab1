@@ -250,10 +250,10 @@ onMounted(async () => {
             </thead>
             <tbody>
               <tr
+                v-if="(searchResults?.outbound?.length ?? false) !== 0"
                 v-for="flight in searchResults?.outbound.filter((f) =>
                   outboundingWideSearch ? f : f.date == search?.onboardDate
                 )"
-                v-if="searchResults?.outbound.length !== 0"
                 @click="outboundChosenFlight = flight"
                 :class="{ selected: flight === outboundChosenFlight }"
                 :key="flight.id"
