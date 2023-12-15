@@ -5,9 +5,9 @@ import Cookies from "js-cookie";
 
 import { ref } from "vue";
 import { useSchedulesStore } from "@/stores/schedules.store";
-import { useErrorsStore } from "@/stores/errors.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
 const { importCSV } = useSchedulesStore();
-const { addError } = useErrorsStore();
+const { addError } = useNotificationsStore();
 
 const importStatistics = ref(null);
 

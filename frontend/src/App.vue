@@ -7,10 +7,14 @@
     <button @click="showDialog = false">No</button>
     <button @click="logout()">Yes</button>
   </dialog>
+  <UIError />
+  <UIAlert />
 </template>
 
 <script setup>
 import { RouterView } from "vue-router";
+import UIError from "@/components/UIError.vue";
+import UIAlert from "@/components/UIAlert.vue";
 </script>
 
 <style>

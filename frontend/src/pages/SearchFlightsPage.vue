@@ -4,23 +4,36 @@ import { useAirportsStore } from "@/stores/airports.store";
 import { useSchedulesStore } from "@/stores/schedules.store";
 import { useTicketsStore } from "@/stores/tickets.store";
 import { storeToRefs } from "pinia";
+import { useNotificationsStore } from "@/stores/notifications.store";
 
 import UIHeader from "@/components/UIHeader.vue";
 import UINav from "@/components/UINav.vue";
 import UISelect from "@/components/UISelect.vue";
 import UIButton from "@/components/UIButton.vue";
+import BookingConfirmationModal from "@/components/BookingConfirmationModal.vue";
 
+const { addAlert } = useNotificationsStore();
 const isBookingConfirmationModalOpen = ref(false);
 const schedules = ref([]);
 const airports = ref([]);
 
 const { allSchedules } = storeToRefs(useSchedulesStore());
-const { getAllSchedules, cancelFlight } = useSchedulesStore();
+const { getAllSchedules } = useSchedulesStore();
 const { allAirports } = storeToRefs(useAirportsStore());
 const { getAllAirports } = useAirportsStore();
-const { searchForTickets, issueTicket } = useTicketsStore();
+const { searchForTickets } = useTicketsStore();
 
 const openBookingConfirmationModal = () => {
+  if (!outboundChosenFlight.value) {
+    addAlert("Please select a passenger");
+    return;
+  }
+
+  if (!numberOfPassengers.value) {
+    addAlert("Please select a number of passengers");
+    return;
+  }
+
   isBookingConfirmationModalOpen.value = true;
 };
 
@@ -29,25 +42,53 @@ const closeBookingConfirmationModal = () => {
 };
 
 const search = ref({
-  from: null,
-  to: null,
-  cabinType: 1,
-  onboard: null,
-  return: null,
+  from: null, // BAH
+  to: null, // AUH
+  cabinType: "Economy",
+  onboardDate: null, // 2017-10-07
+  returnDate: null, // 2017-10-09
+  searchType: "return",
 });
 
-const filteredFromAirports = computed(() => {
-  return airports.value.filter((a) => a.IATACode !== search.value.to);
-});
-
-const filteredToAirports = computed(() => {
-  return airports.value.filter((a) => a.IATACode !== search.value.from);
-});
+const outboundingWideSearch = ref(false);
+const returningWideSearch = ref(false);
+const priceIndex = ref(1);
 
 const searchResults = ref(null);
 
+const numberOfPassengers = ref(null);
+
 const searchTickets = async () => {
-  searchResults.value = await searchForTickets(search.value);
+  const searchCopy = { ...search.value };
+  if (searchCopy.searchType === "oneway") {
+    searchCopy.returnDate = null;
+  }
+
+  searchResults.value = await searchForTickets(searchCopy);
+  priceIndex.value =
+    search.value.cabinType === "First Class"
+      ? 1.35 * 1.3
+      : search.value.cabinType === "Business"
+      ? 1.3
+      : 1;
+
+  outboundChosenFlight.value = searchResults.value?.outbound?.find(
+    (f) => f.date === search.value?.onboardDate
+  );
+
+  returnChosenFlight.value = searchResults.value?.returning?.find(
+    (f) => f.date === search.value?.returnDate
+  );
+};
+
+const outboundChosenFlight = ref(null);
+const returnChosenFlight = ref(null);
+
+const handleTicketsCreated = () => {
+  closeBookingConfirmationModal();
+  outboundChosenFlight.value = null;
+  returnChosenFlight.value = null;
+  numberOfPassengers.value = null;
 };
 
 onMounted(async () => {
@@ -104,9 +145,9 @@ onMounted(async () => {
         <label class="field">
           <span class="label">Cabin Type</span>
           <UISelect v-model="search.cabinType" required>
-            <option value="1" selected>Economy</option>
-            <option value="2">Business</option>
-            <option value="3">First</option>
+            <option value="Economy" selected>Economy</option>
+            <option value="Business">Business</option>
+            <option value="First Class">First class</option>
           </UISelect>
         </label>
         <br />
@@ -114,22 +155,22 @@ onMounted(async () => {
           <label class="radio">
             <span class="label">Return</span>
             <input
-              v-model="search.returnType"
+              v-model="search.searchType"
               class="radio"
               type="radio"
-              value="Return"
-              name="returnType"
+              value="return"
+              name="searchType"
               required
             />
           </label>
           <label class="radio">
             <span class="label">On way</span>
             <input
-              v-model="search.returnType"
+              v-model="search.searchType"
               class="radio"
               type="radio"
-              value="On way"
-              name="returnType"
+              value="oneway"
+              name="searchType"
               required
             />
           </label>
@@ -156,7 +197,11 @@ onMounted(async () => {
             />
             Return
           </span>
-          <input type="date" v-model="search.returnDate" />
+          <input
+            type="date"
+            v-model="search.returnDate"
+            :disabled="search.searchType !== 'return'"
+          />
         </label>
         <UIButton type="submit" class="apply-button">
           <img
@@ -170,11 +215,23 @@ onMounted(async () => {
       </fieldset>
     </form>
     <div class="outbounding-returning-wrapper">
-      <div class="outbounding" v-show="searchResults?.outbounding">
+      <div class="outbounding" v-show="searchResults?.outbound">
         <div class="table-heading">
           <p>Outbounding flight details:</p>
           <label class="table-filter">
-            <input class="checkbox" type="checkbox" name="filterReturning" />
+            <input
+              v-model="outboundingWideSearch"
+              @change="
+                !outboundingWideSearch
+                  ? (outboundChosenFlight = searchResults?.outbound?.find(
+                      (f) => f.date === search?.onboardDate
+                    ))
+                  : null
+              "
+              class="checkbox"
+              type="checkbox"
+              name="filterReturning"
+            />
             <span class="label">Display three days before and after</span>
           </label>
         </div>
@@ -183,7 +240,7 @@ onMounted(async () => {
             <thead>
               <tr>
                 <th>From</th>
-                <th>To time</th>
+                <th>To</th>
                 <th>Date</th>
                 <th>Time</th>
                 <th>Flight Number(s)</th>
@@ -192,14 +249,34 @@ onMounted(async () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="flight in outbounding" :key="flight.id">
-                <td>{{ flight.fromAirport.code }}</td>
-                <td>{{ flight.toAirport.code }}</td>
-                <td>{{ flight.date }}</td>
-                <td>{{ flight.time }}</td>
-                <td>{{ flight.flightNumber }}</td>
-                <td>{{ flight.economyClassPrice }}</td>
-                <td>{{ flight.numberOfStops }}</td>
+              <tr
+                v-for="flight in searchResults?.outbound.filter((f) =>
+                  outboundingWideSearch ? f : f.date == search?.onboardDate
+                )"
+                v-if="searchResults?.outbound.length !== 0"
+                @click="outboundChosenFlight = flight"
+                :class="{ selected: flight === outboundChosenFlight }"
+                :key="flight.id"
+              >
+                <td>{{ flight?.from ?? "–" }}</td>
+                <td>{{ flight?.to ?? "–" }}</td>
+                <td>{{ flight?.date ?? "–" }}</td>
+                <td>{{ flight?.time ?? "–" }}</td>
+                <td>
+                  {{
+                    flight?.flight_numbers?.reduce(
+                      (a, c, i) => a + (i ? " – " : "") + c,
+                      ""
+                    ) ?? "–"
+                  }}
+                </td>
+                <td>
+                  {{ "$" + parseInt(flight?.base_price * priceIndex) ?? "–" }}
+                </td>
+                <td>{{ flight?.flight_numbers?.length - 1 ?? "–" }}</td>
+              </tr>
+              <tr v-else>
+                &#x200B;
               </tr>
             </tbody>
           </table>
@@ -210,7 +287,19 @@ onMounted(async () => {
         <div class="table-heading">
           <p>Return flight details:</p>
           <label class="table-filter">
-            <input class="checkbox" type="checkbox" name="filterReturning" />
+            <input
+              v-model="returningWideSearch"
+              @change="
+                !returningWideSearch
+                  ? (returnChosenFlight = searchResults?.returning?.find(
+                      (f) => f.date === search?.returnDate
+                    ))
+                  : null
+              "
+              class="checkbox"
+              type="checkbox"
+              name="filterReturning"
+            />
             <span class="label">Display three days before and after</span>
           </label>
         </div>
@@ -228,14 +317,34 @@ onMounted(async () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="flight in returning" :key="flight.id">
-                <td>{{ flight.fromAirport.code }}</td>
-                <td>{{ flight.toAirport.code }}</td>
-                <td>{{ flight.date }}</td>
-                <td>{{ flight.time }}</td>
-                <td>{{ flight.flightNumber }}</td>
-                <td>{{ flight.economyClassPrice }}</td>
-                <td>{{ flight.numberOfStops }}</td>
+              <tr
+                v-if="(searchResults?.returning?.length ?? false) !== 0"
+                v-for="flight in searchResults?.returning?.filter((f) =>
+                  returningWideSearch ? f : f.date == search?.returnDate
+                )"
+                @click="returnChosenFlight = flight"
+                :class="{ selected: flight === returnChosenFlight }"
+                :key="flight.id"
+              >
+                <td>{{ flight?.from ?? "–" }}</td>
+                <td>{{ flight?.to ?? "–" }}</td>
+                <td>{{ flight?.date ?? "–" }}</td>
+                <td>{{ flight?.time ?? "–" }}</td>
+                <td>
+                  {{
+                    flight?.flight_numbers?.reduce(
+                      (a, c, i) => a + (i ? " – " : "") + c,
+                      ""
+                    ) ?? "–"
+                  }}
+                </td>
+                <td>
+                  {{ "$" + parseInt(flight?.base_price * priceIndex) ?? "–" }}
+                </td>
+                <td>{{ flight?.flight_numbers?.length - 1 ?? "–" }}</td>
+              </tr>
+              <tr v-else>
+                &#x200B;
               </tr>
             </tbody>
           </table>
@@ -248,8 +357,10 @@ onMounted(async () => {
         <label class="passengers-field">
           <input
             class="passenger-number-input"
-            placeholder="[XXX]"
-            type="text"
+            v-model="numberOfPassengers"
+            placeholder="[XX]"
+            min="0"
+            type="number"
           />
           <span class="label">Passengers</span>
         </label>
@@ -265,8 +376,14 @@ onMounted(async () => {
     </div>
   </main>
   <BookingConfirmationModal
+    :numberOfPassengers="numberOfPassengers"
+    :outboundChosenFlight="outboundChosenFlight"
+    :returnChosenFlight="returnChosenFlight"
+    :cabinType="search.cabinType"
     :open="isBookingConfirmationModalOpen"
     @close="closeBookingConfirmationModal"
+    @ticketsCreated="handleTicketsCreated"
+    @click.stop
   />
 </template>
 
@@ -345,7 +462,7 @@ th {
 }
 
 .actions {
-  margin-inline: 10rem;
+  margin-inline: auto;
   align-self: end;
   display: grid;
   gap: 2rem;
@@ -370,6 +487,9 @@ th {
   display: inline-flex;
   gap: 1rem;
   margin-right: 4rem;
+}
+.selected {
+  box-shadow: inset 0 0 0 3px lightgreen;
 }
 
 .radio {

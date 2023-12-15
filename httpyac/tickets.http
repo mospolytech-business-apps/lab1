@@ -51,13 +51,13 @@ Content-Type: application/json
 
 
 ### Issue ticket 
-POST {{BACKEND_URL}}/tickets/
+POST {{BACKEND_URL}}/tickets/issue-ticket/
 Content-Type: application/json
 
 {
     "user": 1,
     "schedule": 1,
-    "cabin_type": 1,
+    "cabin_type": "First class",
     "first_name": "John",
     "last_name": "Smith",
     "email": "test@test.com",

@@ -1,11 +1,11 @@
 import { ref, computed } from "vue";
 import { api } from "@/api";
 import { defineStore } from "pinia";
-import { useErrorsStore } from "@/stores/errors.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
 import Cookies from "js-cookie";
 
 export const useUsersStore = defineStore("users", () => {
-  const { addError } = useErrorsStore();
+  const { addError } = useNotificationsStore();
 
   const currentUser = ref({});
   const allUsers = ref([]);

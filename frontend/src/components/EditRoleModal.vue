@@ -6,7 +6,7 @@ import UISelect from "@/components/UISelect.vue";
 import { ref, reactive, onMounted, watch, computed } from "vue";
 import { useOfficesStore } from "@/stores/offices.store";
 import { storeToRefs } from "pinia";
-import { useErrorsStore } from "@/stores/errors.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
 import { useUsersStore } from "@/stores/users.store";
 
 const { allOffices } = storeToRefs(useOfficesStore());

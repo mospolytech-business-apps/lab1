@@ -1,27 +1,100 @@
+<script setup>
+import { ref } from "vue";
+import { useTicketsStore } from "@/stores/tickets.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
+
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+
+const { addAlert } = useNotificationsStore();
+const { issueTicket } = useTicketsStore();
+const billingMethod = ref("credit-card");
+
+const props = defineProps({
+  open: { type: Boolean, required: true },
+  passengers: { type: Array, required: true },
+  returnTicketInfo: { type: Object, required: false },
+  outboundTicketInfo: { type: Object, required: true },
+  price: { type: Number, required: true },
+});
+
+const emit = defineEmits(["close", "ticketsCreated"]);
+
+const close = () => {
+  emit("close");
+};
+
+const ticketIssuer = () => {
+  if (!billingMethod.value) {
+    addAlert("Please select a payment method");
+    return;
+  }
+
+  const bookingReference = Math.random().toString(36).substring(7);
+
+  props.passengers.forEach((passenger) => {
+    issueTicket({
+      ...passenger,
+      ...props.outboundTicketInfo,
+      bookingReference: bookingReference,
+    });
+  });
+
+  if (props.returnTicketInfo) {
+    props.passengers.forEach((passenger) => {
+      issueTicket({
+        ...passenger,
+        ...props.returnTicketInfo,
+        bookingReference: bookingReference,
+      });
+    });
+  }
+
+  emit("ticketsCreated");
+};
+</script>
+
 <template>
   <div v-if="props.open" class="billing-modal">
     <UIHeader title="Billing confirmation" :closeButtonHandler="close" />
     <main class="main">
       <div class="payment">
-        <p class="total-amount">Total amount: <b>[XXX]</b></p>
+        <p class="total-amount">
+          Total amount: <b>${{ parseInt(props.price) }}</b>
+        </p>
         <div class="payment-method">
           <p>Paid using:</p>
           <label class="field">
-            <input type="radio" value="credit-card" name="payment-method" />
+            <input
+              type="radio"
+              v-model="billingMethod"
+              value="credit-card"
+              name="payment-method"
+            />
             <span class="label">Credit card</span>
           </label>
           <label class="field">
-            <input type="radio" value="cash" name="payment-method" />
+            <input
+              type="radio"
+              v-model="billingMethod"
+              value="cash"
+              name="payment-method"
+            />
             <span class="label">Cash</span>
           </label>
           <label class="field">
-            <input type="radio" value="voucher" name="payment-method" />
+            <input
+              type="radio"
+              v-model="billingMethod"
+              value="voucher"
+              name="payment-method"
+            />
             <span class="label">Voucher</span>
           </label>
         </div>
       </div>
       <div class="actions">
-        <UIButton @click="issueTicker">
+        <UIButton @click="ticketIssuer">
           <img
             src="src/assets/check-mark-icon.png"
             width="20"
@@ -37,26 +110,6 @@
     </main>
   </div>
 </template>
-
-<script setup>
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-import { ref } from "vue";
-
-const props = defineProps({
-  open: { type: Boolean, required: true },
-});
-
-const emit = defineEmits(["close"]);
-
-const close = () => {
-  emit("close");
-};
-
-const issueTicker = () => {
-  alert("TODO: issue ticket");
-};
-</script>
 
 <style scoped>
 .billing-modal {

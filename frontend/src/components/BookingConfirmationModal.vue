@@ -1,53 +1,284 @@
+<script setup>
+import { ref, watchEffect, onMounted, computed } from "vue";
+import { storeToRefs } from "pinia";
+import { useCountriesStore } from "@/stores/countries.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
+import { useUsersStore } from "@/stores/users.store";
+
+import BillingConfirmation from "@/components/BillingConfirmation.vue";
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import UISelect from "@/components/UISelect.vue";
+
+const { allCountries } = storeToRefs(useCountriesStore());
+const { getAllCountries } = useCountriesStore();
+const { addAlert } = useNotificationsStore();
+const { currentUser } = storeToRefs(useUsersStore());
+
+const counties = ref([]);
+
+const props = defineProps({
+  open: { type: Boolean, required: true },
+  numberOfPassengers: { type: Number, required: true },
+  cabinType: { type: String, required: true },
+  outboundChosenFlight: { type: Object, required: true },
+  returnChosenFlight: { type: Object, required: false },
+});
+
+const passengers = ref([]);
+const outboundTicketInfo = ref(null);
+const returnTicketInfo = ref(null);
+
+const totalPrice = computed(() => {
+  let outboundPrice = props.outboundChosenFlight?.base_price ?? 0;
+  let returnPrice = props.returnChosenFlight?.base_price ?? 0;
+
+  if (props.cabinType === "First Class") {
+    outboundPrice *= 1.3 * 1.35;
+    returnPrice *= 1.3 * 1.35;
+  }
+
+  if (props.cabinType === "Business") {
+    outboundPrice *= 1.3;
+    returnPrice *= 1.3;
+  }
+
+  return (outboundPrice + returnPrice) * props.numberOfPassengers;
+});
+
+watchEffect(() => {
+  passengers.value = Array.from({ length: props.numberOfPassengers }, () => ({
+    firstName: null,
+    lastName: null,
+    birthdate: null,
+    passportNumber: null,
+    passportCountry: null,
+    phoneNumber: null,
+  }));
+});
+
+const isBillingConfirmationOpen = ref(false);
+
+const openBillingConfirmationModal = () => {
+  if (
+    passengers.value.some((p) => {
+      return Object.values(p).some((value) => value === null);
+    })
+  ) {
+    addAlert("Please fill all passenger details");
+    return;
+  }
+
+  isBillingConfirmationOpen.value = true;
+};
+
+const closeBillingConfirmationModal = () => {
+  isBillingConfirmationOpen.value = false;
+};
+
+const emit = defineEmits(["close"]);
+
+const close = () => {
+  emit("close");
+};
+
+const newPassenger = ref({
+  firstName: null,
+  lastName: null,
+  birthdate: null,
+  passportNumber: null,
+  passportCountry: null,
+  phoneNumber: null,
+});
+
+watchEffect(() => {
+  outboundTicketInfo.value = {
+    user: currentUser.value.id,
+    schedule: props.outboundChosenFlight?.id ?? null,
+    cabinType: props.cabinType,
+  };
+
+  returnTicketInfo.value = props.returnChosenFlight
+    ? {
+        user: currentUser.value.id,
+        schedule: props.returnChosenFlight?.id ?? null,
+        cabinType: props.cabinType,
+      }
+    : null;
+});
+
+const selectPassenger = (passenger) => {
+  selectedPassenger.value = passenger;
+};
+
+const selectedPassenger = ref(null);
+
+const addPassenger = () => {
+  const index = passengers.value.findIndex((passenger) => {
+    return Object.values(passenger).every((value) => value === null);
+  });
+
+  if (index !== -1) {
+    passengers.value[index] = { ...newPassenger.value };
+    newPassenger.value = {
+      firstName: null,
+      lastName: null,
+      birthdate: null,
+      passportNumber: null,
+      passportCountry: null,
+      phoneNumber: null,
+    };
+  } else {
+    addAlert("You have reached the maximum number of passengers");
+  }
+};
+
+const removePassenger = () => {
+  const index = passengers.value.findIndex(
+    (p) => p === selectedPassenger.value
+  );
+
+  passengers.value[index] = {
+    firstName: null,
+    lastName: null,
+    birthdate: null,
+    passportNumber: null,
+    passportCountry: null,
+    phoneNumber: null,
+  };
+};
+
+const handleTicketsCreated = () => {
+  passengers.value = [];
+  closeBillingConfirmationModal();
+  emit("ticketsCreated");
+};
+
+onMounted(async () => {
+  counties.value = allCountries.value.length
+    ? allCountries.value
+    : await getAllCountries();
+});
+</script>
+
 <template>
   <div v-if="props.open" class="modal">
     <UIHeader title="Booking confirmation" :closeButtonHandler="close" />
     <main class="main">
-      <fieldset class="details">
-        <legend>Outbounding flight details</legend>
-        <p class="detail">From: <b>QWE</b></p>
-        <p class="detail">To: <b>ABC</b></p>
-        <p class="detail">Cabin Type: <b>Economy</b></p>
-        <p class="detail">Date: <b>11/10/2017</b></p>
-        <p class="detail">Flight number: <b>1908</b></p>
+      <fieldset class="details" v-if="props.outboundChosenFlight">
+        <legend>Outbound flight details</legend>
+        <p class="detail">
+          From: <b>{{ props.outboundChosenFlight?.from }}</b>
+        </p>
+        <p class="detail">
+          To: <b>{{ props.outboundChosenFlight?.to }}</b>
+        </p>
+        <p class="detail">
+          Cabin Type: <b>{{ props.cabinType }}</b>
+        </p>
+        <p class="detail">
+          Date:
+          <b>{{ props.outboundChosenFlight?.date?.replace(/-/g, "/") }}</b>
+        </p>
+        <p class="detail">
+          Flight number:
+          <b>{{
+            props.outboundChosenFlight?.flight_numbers?.reduce(
+              (a, c, i) => a + (i ? " – " : "") + c,
+              ""
+            ) ?? "–"
+          }}</b>
+        </p>
       </fieldset>
-      <fieldset class="details">
+      <fieldset class="details" v-if="props.returnChosenFlight">
         <legend>Return flight details</legend>
-        <p class="detail">From: <b>QWE</b></p>
-        <p class="detail">To: <b>ABC</b></p>
-        <p class="detail">Cabin Type: <b>Economy</b></p>
-        <p class="detail">Date: <b>11/10/2017</b></p>
-        <p class="detail">Flight number: <b>1908</b></p>
+        <p class="detail">
+          From: <b>{{ props.returnChosenFlight?.from }}</b>
+        </p>
+        <p class="detail">
+          To: <b> {{ props.returnChosenFlight?.to }} </b>
+        </p>
+        <p class="detail">
+          Cabin Type: <b>{{ props.cabinType }}</b>
+        </p>
+        <p class="detail">
+          Date: <b>{{ props.returnChosenFlight?.date?.replace(/-/g, "/") }}</b>
+        </p>
+        <p class="detail">
+          Flight number:
+          <b>{{
+            props.returnChosenFlight?.flight_numbers?.reduce(
+              (a, c, i) => a + (i ? " – " : "") + c,
+              ""
+            ) ?? "–"
+          }}</b>
+        </p>
       </fieldset>
-      <fieldset class="passenger-details">
-        <legend>Passenger details</legend>
-        <label class="field">
-          <span class="label">Firstname</span>
-          <input class="input" type="text" required />
-        </label>
-        <label class="field">
-          <span class="label">Lastname</span>
-          <input class="input" type="text" required />
-        </label>
-        <label class="field">
-          <span class="label">Birthdate</span>
-          <input class="input" type="date" required />
-        </label>
-        <label class="field">
-          <span class="label">Passport number</span>
-          <input class="input" type="text" required />
-        </label>
-        <label class="field">
-          <span class="label">Passport country</span>
-          <UISelect class="input" placeholder=" " required>
-            <option value="russia">Russia</option>
-          </UISelect>
-        </label>
-        <label class="field">
-          <span class="label">Phone</span>
-          <input class="input" placeholder="(___) ___ __-__" type="tel" />
-        </label>
-        <UIButton class="passenger-details-btn">Add passenger</UIButton>
-      </fieldset>
+      <form @submit.prevent="addPassenger">
+        <fieldset class="passenger-details">
+          <legend>Passenger details</legend>
+          <label class="field">
+            <span class="label">Firstname</span>
+            <input
+              v-model="newPassenger.firstName"
+              class="input"
+              type="text"
+              required
+            />
+          </label>
+          <label class="field">
+            <span class="label">Lastname</span>
+            <input
+              v-model="newPassenger.lastName"
+              class="input"
+              type="text"
+              required
+            />
+          </label>
+          <label class="field">
+            <span class="label">Birthdate</span>
+            <input
+              v-model="newPassenger.birthdate"
+              class="input"
+              type="date"
+              required
+            />
+          </label>
+          <label class="field">
+            <span class="label">Passport number</span>
+            <input
+              v-model="newPassenger.passportNumber"
+              class="input"
+              type="text"
+              required
+            />
+          </label>
+          <label class="field">
+            <span class="label">Passport country</span>
+            <UISelect
+              v-model="newPassenger.passportCountry"
+              class="input"
+              placeholder=" "
+              required
+            >
+              <option v-for="country in counties" :value="country.name">
+                {{ country.name }}
+              </option>
+            </UISelect>
+          </label>
+          <label class="field">
+            <span class="label">Phone</span>
+            <input
+              v-model="newPassenger.phoneNumber"
+              class="input"
+              placeholder="(___) ___ __-__"
+              type="tel"
+              required
+            />
+          </label>
+          <UIButton class="passenger-details-btn">Add passenger</UIButton>
+        </fieldset>
+      </form>
 
       <div class="passengers-list">
         <p class="table-title">Passengers list</p>
@@ -66,19 +297,19 @@
             <tbody>
               <tr
                 v-for="passenger in passengers"
-                :key="passenger.id"
+                :key="passenger.passportNumber"
                 @click="selectPassenger(passenger)"
                 :class="{
                   selected: passenger === selectedPassenger,
                   row: true,
                 }"
               >
-                <td>{{ passenger.firstName || "–" }}</td>
-                <td>{{ passenger.lastName || "–" }}</td>
-                <td>{{ passenger.birthdate || "–" }}</td>
-                <td>{{ passenger.passportNumber || "–" }}</td>
-                <td>{{ passenger.passportCounty || "–" }}</td>
-                <td>{{ passenger.phone || "–" }}</td>
+                <td>{{ passenger?.firstName ?? "–" }}</td>
+                <td>{{ passenger?.lastName ?? "–" }}</td>
+                <td>{{ passenger?.birthdate ?? "–" }}</td>
+                <td>{{ passenger?.passportNumber ?? "–" }}</td>
+                <td>{{ passenger?.passportCountry ?? "–" }}</td>
+                <td>{{ passenger?.phoneNumber ?? "–" }}</td>
               </tr>
             </tbody>
           </table>
@@ -105,64 +336,14 @@
   </div>
   <BillingConfirmation
     :open="isBillingConfirmationOpen"
+    :passengers="passengers"
+    :outboundTicketInfo="outboundTicketInfo"
+    :returnTicketInfo="returnTicketInfo"
+    :price="totalPrice"
     @close="closeBillingConfirmationModal"
+    @ticketsCreated="handleTicketsCreated"
   />
 </template>
-
-<script setup>
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-import UISelect from "@/components/UISelect.vue";
-import BillingConfirmation from "@/components/BillingConfirmation.vue";
-import { ref } from "vue";
-
-const isBillingConfirmationOpen = ref(false);
-
-const openBillingConfirmationModal = () => {
-  isBillingConfirmationOpen.value = true;
-};
-
-const closeBillingConfirmationModal = () => {
-  isBillingConfirmationOpen.value = false;
-};
-
-const props = defineProps({
-  open: { type: Boolean, required: true },
-});
-
-const emit = defineEmits(["close"]);
-
-const apiUrl = "src/data/passengers.json";
-
-const passengers = ref([]);
-
-const close = () => {
-  emit("close");
-};
-
-const selectedPassenger = ref(null);
-
-const selectPassenger = (passenger) => {
-  selectedPassenger.value = passenger;
-};
-
-const removePassenger = () => {
-  // TODO: remove passenger
-  console.log("removePassenger");
-};
-
-const fetchPassengers = async () => {
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    passengers.value = data;
-  } catch (error) {
-    console.error("Error fetching list of passengers:", error);
-  }
-};
-
-fetchPassengers();
-</script>
 
 <style scoped>
 .modal {
@@ -191,7 +372,9 @@ fetchPassengers();
 .table-wrapper {
   flex-grow: 1;
   width: 100%;
+  height: 20rem;
   border: 2px solid black;
+  margin-bottom: 1rem;
   overflow: scroll;
 }
 
@@ -221,22 +404,26 @@ fetchPassengers();
 
 .field {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
 }
 .input {
   /* width: 100%; */
   min-width: 10rem;
   flex-grow: 1;
+  height: min-content;
 }
 
 .label {
   flex-grow: 1;
   align-self: center;
   width: max-content;
+  white-space: nowrap;
 }
 
 thead {
   background-color: lightgray;
+  border-bottom: 3px solid black;
 }
 
 td,

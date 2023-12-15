@@ -10,13 +10,13 @@ import { ref, onUnmounted, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useUsersStore } from "@/stores/users.store";
 import { useOfficesStore } from "@/stores/offices.store";
-import { useErrorsStore } from "@/stores/errors.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
 
 const { getAllUsers, ban, unban } = useUsersStore();
 const { allUsers } = storeToRefs(useUsersStore());
 const { getAllOffices } = useOfficesStore();
 const { allOffices } = storeToRefs(useOfficesStore());
-const { addError } = useErrorsStore();
+const { addError } = useNotificationsStore();
 
 const isAddUserModalOpen = ref(false);
 const isEditRoleModalOpen = ref(false);

@@ -375,22 +375,12 @@ export const api = {
     }
   },
 
-  // tickets
-  searchForTickets: async (accessToken, payload) => {
+  // countries
+  getAllCountries: async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/tickets/search/`, {
-        method: "POST",
-        headers: {
-          ...headers,
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: {
-          from_airport: payload.from,
-          to_airport: payload.to,
-          cabin_type: payload.cabinType,
-          outbound_date: payload.outboundDate,
-          return_date: payload.returnDate,
-        },
+      const response = await fetch(`${BACKEND_URL}/countries/`, {
+        method: "GET",
+        headers: { ...headers },
       });
 
       if (!response.ok) {
@@ -405,15 +395,58 @@ export const api = {
     }
   },
 
-  issueTicket: async (accessToken, payload) => {
+  // tickets
+  searchForTickets: async ({ accessToken, payload }) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/tickets/`, {
+      const response = await fetch(`${BACKEND_URL}/tickets/search/`, {
         method: "POST",
         headers: {
           ...headers,
           Authorization: `Bearer ${accessToken}`,
         },
-        body: payload,
+        body: JSON.stringify({
+          from_airport: payload.from,
+          to_airport: payload.to,
+          cabin_type: payload.cabinType,
+          outbound_date: payload.onboardDate,
+          return_date: payload.returnDate,
+          wide_search: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  issueTicket: async ({ accessToken, payload }) => {
+    console.log(payload);
+    try {
+      const response = await fetch(`${BACKEND_URL}/tickets/issue-ticket/`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          user: payload.user,
+          schedule: payload.schedule,
+          cabin_type: payload.cabinType,
+          first_name: payload.firstName,
+          last_name: payload.lastName,
+          phone: payload.phoneNumber,
+          passport_number: payload.passportNumber,
+          passport_country_id: payload.passportCountry,
+          booking_reference: payload.bookingReference,
+          confirmed: true,
+        }),
       });
 
       if (!response.ok) {

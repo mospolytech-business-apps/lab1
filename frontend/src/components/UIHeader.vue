@@ -1,7 +1,6 @@
 <template>
   <header class="header">
     <h1 class="title">{{ props.title }}</h1>
-    <UIError />
     <button @click="closeButtonHandler" class="exit-btn">
       <img width="20" src="@/assets/cross-icon.png" alt="Exit button" />
     </button>
@@ -9,7 +8,6 @@
 </template>
 
 <script setup>
-import UIError from "@/components/UIError.vue";
 import { useAuthStore } from "../stores/auth.store";
 
 const props = defineProps({

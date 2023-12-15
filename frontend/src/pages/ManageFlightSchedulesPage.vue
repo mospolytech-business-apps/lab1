@@ -10,9 +10,9 @@ import { onMounted, ref, computed } from "vue";
 import { useSchedulesStore } from "@/stores/schedules.store";
 import { useAirportsStore } from "@/stores/airports.store";
 import { storeToRefs } from "pinia";
-import { useErrorsStore } from "@/stores/errors.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
 
-const { addError } = useErrorsStore();
+const { addError } = useNotificationsStore();
 const { allSchedules } = storeToRefs(useSchedulesStore());
 const { getAllSchedules, cancelFlight } = useSchedulesStore();
 const { allAirports } = storeToRefs(useAirportsStore());

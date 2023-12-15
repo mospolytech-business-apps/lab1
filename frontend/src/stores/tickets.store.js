@@ -1,11 +1,11 @@
 import { ref } from "vue";
 import { defineStore, storeToRefs } from "pinia";
 import { api } from "@/api";
-import { useErrorsStore } from "@/stores/errors.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
 import Cookies from "js-cookie";
 
 export const useTicketsStore = defineStore("tickets", () => {
-  const { addError } = useErrorsStore();
+  const { addError } = useNotificationsStore();
 
   const searchForTickets = async (data) => {
     const { res, err } = await api.searchForTickets({

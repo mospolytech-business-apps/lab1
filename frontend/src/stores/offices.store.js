@@ -1,10 +1,10 @@
 import { ref } from "vue";
 import { defineStore, storeToRefs } from "pinia";
 import { api } from "@/api";
-import { useErrorsStore } from "@/stores/errors.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
 
 export const useOfficesStore = defineStore("offices", () => {
-  const { addError } = useErrorsStore();
+  const { addError } = useNotificationsStore();
 
   const allOffices = ref([]);
 

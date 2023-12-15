@@ -1,6 +1,6 @@
 import { defineStore, storeToRefs } from "pinia";
 import { api } from "@/api";
-import { useErrorsStore } from "@/stores/errors.store";
+import { useNotificationsStore } from "@/stores/notifications.store";
 import { useUsersStore } from "@/stores/users.store";
 import router from "@/router";
 import { ref } from "vue";
@@ -8,7 +8,7 @@ import { ref } from "vue";
 import Cookies from "js-cookie";
 
 export const useAuthStore = defineStore("auth", () => {
-  const { addError } = useErrorsStore();
+  const { addError } = useNotificationsStore();
   const { currentUser, userRole } = storeToRefs(useUsersStore());
 
   const login = async (username, password) => {
