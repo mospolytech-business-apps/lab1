@@ -15,6 +15,10 @@ from office.models import Office
 from django.db.models import Count
 from authentication.models import User
 from datetime import datetime, timedelta
+from datetime import date
+import time
+import math
+
 
 class AmenityViewSet(viewsets.ModelViewSet):
     queryset = Amenity.objects.all()
@@ -102,79 +106,169 @@ class AmenityViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="full-report")
     def full_report(self, request):
-        # Получение данных по Amenity
-        amenities = Amenity.objects.all()
-        amenities_data = AmenityTicket.objects.filter(amenity__in=amenities).values(
-            "amenity__name",
-            "ticket__cabin_type",
-            "ticket__first_name",
-            "ticket__last_name",
-            "ticket__passport_number",
+        today = date(2017, 12, 28)
+        thirty_days_ago = today - timedelta(days=30)
+
+        start_time = time.time()
+
+        # Flights stats
+        confirmed_tickets = Ticket.objects.filter(
+            schedule__Date__gte=thirty_days_ago, confirmed=True
+        )
+        canceled_tickets = Ticket.objects.filter(
+            schedule__Date__gte=thirty_days_ago, confirmed=False
         )
 
-        # Получение топ клиентов
+        confirmed_flights_count = confirmed_tickets.count()
+        canceled_flights_count = canceled_tickets.count()
+
+        # Average flight time
+        schedules = Schedule.objects.filter(Date__range=[thirty_days_ago, today])
+        number_of_flights = Schedule.objects.filter(
+            Date__range=[thirty_days_ago, today]
+        ).count()
+
+        total_duration = 0
+        for schedule in schedules:
+            flight_time = schedule.Route.FlightTime
+            total_duration += flight_time
+
+        average_daily_flight_time = int(total_duration / number_of_flights)
+
+        # Busiest and quietest days in last 30 days
+        schedules = Schedule.objects.filter(Date__range=[thirty_days_ago, today])
+        date_counts = schedules.values("Date").annotate(count=Count("id"))
+
+        max_date = max(date_counts, key=lambda x: x["count"])
+        max_schedules = max_date["count"]
+
+        min_date = min(date_counts, key=lambda x: x["count"])
+        min_schedules = min_date["count"]
+
+        # Top clients in last 30 days
         top_clients = (
-            Ticket.objects.values("user__email")
-            .annotate(total_tickets=Count("id"))
-            .order_by("-total_tickets")[:5]
+            Ticket.objects.filter(schedule__Date__range=[thirty_days_ago, today])
+            .values("user__first_name", "user__last_name")
+            .annotate(count=Count("passport_number", distinct=True))
+            .order_by("-count")[:5]
         )
 
-        # Получение топ офисов
+        # Top offices
         top_offices = (
-            Office.objects.values("title")
-            .annotate(total_tickets=Count("user__id"))
-            .order_by("-total_tickets")[:5]
-        )
-
-        # Получение количества confirmed и canceled рейсов
-        flight_status_counts = (
-            Ticket.objects.values("confirmed")
+            Ticket.objects.filter(schedule__Date__range=[thirty_days_ago, today])
+            .values("user__office__title")
             .annotate(count=Count("id"))
-            .order_by("-count")
+            .order_by("-count")[:5]
         )
 
-        confirmed_flights_count = 0
-        canceled_flights_count = 0
-        for status_count in flight_status_counts:
-            if status_count["confirmed"]:
-                confirmed_flights_count = status_count["count"]
-            else:
-                canceled_flights_count = status_count["count"]
+        # Revenue from tickets sales (yesterday, 2 days ago, 3 days ago)
+        revenues = []
+        for d in [
+            today - timedelta(days=1),
+            today - timedelta(days=2),
+            today - timedelta(days=3),
+        ]:
+            tickets = Ticket.objects.filter(
+                schedule__Date__range=[d, today], confirmed=True
+            )
+            rev = 0
+            for ticket in tickets:
+                price_multiplier = 1
+                if ticket.cabin_type == "First Class":
+                    price_multiplier = 1.30 * 1.35
+                elif ticket.cabin_type == "Business":
+                    price_multiplier = 1.30
 
-        # Calculate average flight duration
-        confirmed_tickets = Ticket.objects.filter(confirmed=True)
-        total_duration = timedelta()
-        for ticket in confirmed_tickets:
-            flight_start_time = datetime.combine(ticket.schedule.Date, ticket.schedule.Time)
-            flight_end_time = flight_start_time + timedelta(minutes=ticket.schedule.Route.FlightTime)
-            duration = flight_end_time - flight_start_time
-            total_duration += duration
+                rev += ticket.schedule.EconomyPrice * price_multiplier
 
-        average_duration = total_duration / len(confirmed_tickets)
+            revenues.append({"date": str(d), "amount": int(rev)})
 
-        # Calculate busiest and least busy days
-        flight_counts_by_day = Schedule.objects.filter(
-            Date__in=confirmed_tickets.values("schedule__Date")
-        ).values("Date").annotate(total_flights=Count("id")).order_by("-total_flights")
+        yesterday_revenue = revenues[0]["amount"]
+        two_days_ago_revenue = revenues[1]["amount"]
+        three_days_ago_revenue = revenues[2]["amount"]
 
-        busiest_day = flight_counts_by_day.first()
-        least_busy_day = flight_counts_by_day.last()
+        # Weakly report of percentage of empty seats (this week, last week, 2 weeks ago)
+        # this week
+        last_week = today - timedelta(weeks=1)
+        tickets_this_week = Ticket.objects.filter(
+            schedule__Date__range=[last_week, today]
+        )
+        schedules_this_week = Schedule.objects.filter(Date__range=[last_week, today])
+        seats_this_week = sum(s.Aircraft.TotalSeats for s in schedules_this_week)
+        empty_pct_this_week = (
+            100 * (seats_this_week - tickets_this_week.count()) / seats_this_week
+        )
 
-        # Общий результат
-        result = {
-            "amenities": {"amenities": list(amenities_data)},
-            "top_clients": {"top_clients": list(top_clients)},
-            "top_offices": {"top_offices": list(top_offices)},
-            "flight_counts": {
-                "confirmed_flights_count": confirmed_flights_count,
-                "canceled_flights_count": canceled_flights_count,
-                "average_flight_duration": str(average_duration),
-                "busiest_day": busiest_day["Date"] if busiest_day else None,
-                "least_busy_day": least_busy_day["Date"] if least_busy_day else None,
+        # two weeks ago
+        two_weeks_ago = today - timedelta(weeks=2)
+        tickets_last_week = Ticket.objects.filter(
+            schedule__Date__range=[two_weeks_ago, today]
+        )
+        schedules_last_week = Schedule.objects.filter(
+            Date__range=[two_weeks_ago, today]
+        )
+        seats_last_week = sum(s.Aircraft.TotalSeats for s in schedules_last_week)
+        empty_pct_last_week = (
+            100 * (seats_last_week - tickets_last_week.count()) / seats_last_week
+        )
+
+        # three weeks ago
+        three_weeks_ago = today - timedelta(weeks=3)
+        tickets_two_weeks_ago = Ticket.objects.filter(
+            schedule__Date__range=[three_weeks_ago, today]
+        )
+        schedules_two_weeks_ago = Schedule.objects.filter(
+            Date__range=[three_weeks_ago, today]
+        )
+        seats_two_weeks_ago = sum(
+            s.Aircraft.TotalSeats for s in schedules_two_weeks_ago
+        )
+        empty_pct_two_weeks_ago = (
+            100
+            * (seats_two_weeks_ago - tickets_two_weeks_ago.count())
+            / seats_two_weeks_ago
+        )
+
+        def truncate(f, n):
+            return math.floor(f * 10**n) / 10**n
+
+        response = {
+            "flights": {
+                "confirmed": confirmed_flights_count,
+                "cancelled": canceled_flights_count,
+                "average_daily_flight_time": average_daily_flight_time,
+            },
+            "number_of_passengers": {
+                "busiest": {"day": max_date["Date"], "flights": max_schedules},
+                "quietest": {"day": min_date["Date"], "flights": min_schedules},
+            },
+            "top_clients": [
+                {
+                    "name": f"{client['user__first_name']} {client['user__last_name']}",
+                    "flights": client["count"],
+                }
+                for client in top_clients
+            ],
+            "top_offices": [
+                {"name": office["user__office__title"], "flights": office["count"]}
+                for office in top_offices
+            ],
+            "revenue": {
+                "yesterday": yesterday_revenue,
+                "two_days_ago": two_days_ago_revenue,
+                "three_days_ago": three_days_ago_revenue,
+            },
+            "weekly_seats_empty": {
+                "yesterday": truncate(empty_pct_this_week, 2),
+                "two_days_ago": truncate(empty_pct_last_week, 2),
+                "three_days_ago": truncate(empty_pct_two_weeks_ago, 2),
             },
         }
 
-        return Response(result)
+        end_time = time.time()
+        response["report_generated_in"] = truncate(end_time - start_time, 3)
+
+        return Response(response)
 
     @action(detail=False, url_path="amenities-tickets")
     def amenities_tickets(self, request):

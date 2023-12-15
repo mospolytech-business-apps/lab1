@@ -105,7 +105,7 @@ POST {{BACKEND_URL}}/amenities/amenities-report/
 Authorization: Bearer {{login.access}}
 Content-Type: application/json
 {
-    "booking_reference": "SE3RD1",
+    "booking_reference":"SE3RD1",
     "start_date": null,
     "end_date": null
 }
@@ -142,19 +142,23 @@ Content-Type: application/json
 
 /* Response
 {
+    // in last 30 days
     "flights": {
         "confirmed": 10,
         "cancelled": 20,
         "average_daily_flight_time": 20,
     },
+    // number of passengers in last 30 days in most busiest day
     "number_of_passengers_busiest": {
         "day": "2020-01-01",
         "flights": 123 ,
     },
+    // number of passengers in last 30 days in most quiet day
     "number_of_passengers_quiet": {
         "day": "2020-01-01",
         "flights": 123 ,
     },
+    // top clients in last 30 days by number of purchased tickets
     "top_clients": [
       {
         "name": "John Doe",
@@ -169,12 +173,17 @@ Content-Type: application/json
         "flights": 124
       },
     ],
+    // top offices in last 30 days by number of purchased tickets
     "top_offices": ["Abu dhabi", "Cairo", "Riyadh","Bahrain","Doha"],
+    
+    // revenue from tickets sales
     "revenue": {
         "yesterday": 57,
         "two_days_ago": 41,
         "three_days_ago": 12
     },
+    
+    // weakly report of percentage of empty seats
     "weekly_seats_empty": {
         "yesterday": 14,
         "two_days_ago": 12,
