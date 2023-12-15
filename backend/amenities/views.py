@@ -27,80 +27,65 @@ class AmenityViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"], url_path="amenities-report")
     def amenities_report(self, request):
         booking_reference = request.data.get("booking_reference")
-        start_time = request.data.get("start_time")
-        end_time = request.data.get("end_time")
 
-        if not booking_reference and not (start_time or end_time):
+        if not booking_reference:
             return Response(
-                {
-                    "error": "Необходимо указать либо код бронирования, либо идентификатор рейса, начальное и конечное время."
-                },
+                {"error": "Необходимо указать код бронирования."},
                 status=400,
             )
 
         try:
-            if booking_reference:
-                ticket = Ticket.objects.get(booking_reference=booking_reference)
-                amenities_data = AmenityTicket.objects.filter(ticket=ticket).values(
-                    "amenity__name",
-                    "ticket__cabin_type",
-                    "ticket__first_name",
-                    "ticket__last_name",
-                    "ticket__passport_number",
-                )
-                return Response(
-                    {"class": ticket.cabin_type.name, "data": list(amenities_data)}
-                )
+            ticket = Ticket.objects.get(booking_reference=booking_reference)
 
-            elif start_time or end_time:
-                tickets = Ticket.objects.filter(
-                    schedule__Date__gte=start_time, schedule__Date__lte=end_time
-                )
+            amenities_data = AmenityTicket.objects.filter(ticket=ticket).values(
+                "amenity__name",
+                "amenity__price",
+                "ticket__id",
+                "ticket__schedule__id",
+                "ticket__schedule__Route__DepartureAirport__IATACode",  # Изменение здесь
+                "ticket__schedule__Route__ArrivalAirport__IATACode",    # Изменение здесь
+                "ticket__schedule__Date",
+                "ticket__schedule__Time",
+            )
 
-                if not tickets.exists():
-                    return Response({"error": "Билеты не найдены."}, status=404)
+            passenger_data = {
+                "name": f"{ticket.first_name} {ticket.last_name}",
+                "passport": ticket.passport_number,
+                "cabin_type": ticket.cabin_type.name,
+            }
 
-                # Сбор всех подходящих под фильтр объектов AmenityTicket
-                amenities_data = AmenityTicket.objects.filter(
-                    ticket__in=tickets
-                ).values(
-                    "amenity__name",
-                    "ticket__cabin_type",
-                    "ticket__first_name",
-                    "ticket__last_name",
-                    "ticket__passport_number",
-                )
+            result_data = []
+            for item in amenities_data:
+                result_data.append({
+                    "ticket": {
+                        "id": item["ticket__id"],
+                        "schedule": {
+                            "id": item["ticket__schedule__id"],
+                            "departure_airport": item["ticket__schedule__Route__DepartureAirport__IATACode"],  # Изменение здесь
+                            "arrival_airport": item["ticket__schedule__Route__ArrivalAirport__IATACode"],  # Изменение здесь
+                            "date": str(item["ticket__schedule__Date"]),
+                            "time": str(item["ticket__schedule__Time"]),
+                        },
+                    },
+                    "amenities": [
+                        {
+                            "name": item["amenity__name"],
+                            "price": item["amenity__price"],
+                            "default": True,  # Может потребоваться настроить в соответствии с вашей логикой
+                            "selected": True,
+                        }
+                    ]
+                })
 
-                if not amenities_data.exists():
-                    return Response(
-                        {"error": "Данные по услугам не найдены."}, status=404
-                    )
+            response_data = {
+                "passenger": passenger_data,
+                "data": result_data,
+            }
 
-                # Форматирование данных как указано
-                amenities = [item["amenity__name"] for item in amenities_data]
-                statistics = {}
-                for item in amenities_data:
-                    if item["ticket__cabin_type"] not in statistics:
-                        statistics[item["ticket__cabin_type"]] = [0, 0, 0, 0]
+            return Response(response_data)
 
-                    # Пример подсчета количества услуг для каждого класса
-                    if item["amenity__name"] == "Some Amenity":
-                        statistics[item["ticket__cabin_type"]][0] += 1
-                    elif item["amenity__name"] == "Another Amenity":
-                        statistics[item["ticket__cabin_type"]][1] += 1
-
-                result = {
-                    "amenities": amenities,
-                    "statistics": [
-                        {"class": key, "data": value}
-                        for key, value in statistics.items()
-                    ],
-                }
-
-                return Response(result)
-
-        except (Ticket.DoesNotExist, Schedule.DoesNotExist):
-            return Response({"error": "Билет или рейс не найден."}, status=404)
+        except Ticket.DoesNotExist:
+            return Response({"error": "Билет с указанным кодом бронирования не найден."}, status=404)
         except Exception as e:
             return Response({"error": f"Произошла ошибка: {str(e)}"}, status=500)
 
