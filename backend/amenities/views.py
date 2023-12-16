@@ -15,6 +15,7 @@ from office.models import Office
 from django.db.models import Count
 from authentication.models import User
 from datetime import datetime, timedelta
+from django.db import IntegrityError
 from datetime import date
 import time
 import math
@@ -24,7 +25,7 @@ class AmenityViewSet(viewsets.ModelViewSet):
     queryset = Amenity.objects.all()
     serializer_class = AmenitySerializer
 
-    @action(detail=False, methods=["post"], url_path="amenities-report")
+    @action(detail=False, methods=["post"], url_path="search")
     def amenities_report(self, request):
         booking_reference = request.data.get("booking_reference")
 
@@ -37,16 +38,18 @@ class AmenityViewSet(viewsets.ModelViewSet):
         try:
             ticket = Ticket.objects.get(booking_reference=booking_reference)
 
-            amenities_data = AmenityTicket.objects.filter(ticket=ticket).values(
-                "amenity__name",
-                "amenity__price",
-                "ticket__id",
-                "ticket__schedule__id",
-                "ticket__schedule__Route__DepartureAirport__IATACode",  # Изменение здесь
-                "ticket__schedule__Route__ArrivalAirport__IATACode",    # Изменение здесь
-                "ticket__schedule__Date",
-                "ticket__schedule__Time",
+            today = datetime.now()
+            today = datetime(2017, 10, 9, 12, 0, 0)
+
+            # Check if the flight has already left
+            flight_datetime = datetime.combine(
+                ticket.schedule.Date, ticket.schedule.Time
             )
+            if flight_datetime < today:
+                return Response(
+                    {"error": "Сервис недоступен, так как рейс уже состоялся."},
+                    status=400,
+                )
 
             passenger_data = {
                 "name": f"{ticket.first_name} {ticket.last_name}",
@@ -54,43 +57,79 @@ class AmenityViewSet(viewsets.ModelViewSet):
                 "cabin_type": ticket.cabin_type.name,
             }
 
-            result_data = []
-            for item in amenities_data:
-                result_data.append({
-                    "ticket": {
-                        "id": item["ticket__id"],
-                        "schedule": {
-                            "id": item["ticket__schedule__id"],
-                            "departure_airport": item["ticket__schedule__Route__DepartureAirport__IATACode"],  # Изменение здесь
-                            "arrival_airport": item["ticket__schedule__Route__ArrivalAirport__IATACode"],  # Изменение здесь
-                            "date": str(item["ticket__schedule__Date"]),
-                            "time": str(item["ticket__schedule__Time"]),
-                        },
+            result_data = {
+                "ticket": {
+                    "id": ticket.id,
+                    "schedule": {
+                        "id": ticket.schedule.id,
+                        "departure_airport": ticket.schedule.Route.DepartureAirport.IATACode,
+                        "arrival_airport": ticket.schedule.Route.ArrivalAirport.IATACode,
+                        "date": str(ticket.schedule.Date),
+                        "time": str(ticket.schedule.Time),
                     },
-                    "amenities": [
-                        {
-                            "name": item["amenity__name"],
-                            "price": item["amenity__price"],
-                            "default": True,  # Может потребоваться настроить в соответствии с вашей логикой
-                            "selected": True,
-                        }
-                    ]
-                })
+                },
+                "amenities": [],
+            }
+
+            default_list = []
+            if ticket.cabin_type.name == "Economy":
+                default_list = [
+                    "Wi-Fi 50 mb",
+                    "Soft Drinks",
+                ]
+            elif ticket.cabin_type.name == "Business":
+                default_list = [
+                    "Wi-Fi 50 mb",
+                    "Wi-Fi 250 mb",
+                    "Fast Checkin Lane",
+                    "Soft Drinks",
+                    "Laptop Rental",
+                    "Tablet Rental",
+                ]
+            elif ticket.cabin_type.name == "First Class":
+                default_list = [
+                    "Wi-Fi 50 mb",
+                    "Wi-Fi 250 mb",
+                    "Fast Checkin Lane",
+                    "Extra Bag",
+                    "Premium Headphones Rental",
+                    "Soft Drinks",
+                    "Lounge Access",
+                    "Laptop Rental",
+                    "Tablet Rental",
+                    "Extra Blanket",
+                ]
+
+            amenities_data = AmenityTicket.objects.filter(ticket=ticket)
+            ticket_amenities_names = [t.amenity.name for t in amenities_data]
+
+            all_amenities = Amenity.objects.values("name", "price")
+            for amenity in all_amenities:
+                result_data["amenities"].append(
+                    {
+                        "name": amenity["name"],
+                        "price": amenity["price"],
+                        "default": amenity["name"] in default_list,
+                        "selected": amenity["name"] in ticket_amenities_names,
+                    }
+                )
 
             response_data = {
                 "passenger": passenger_data,
-                "data": result_data,
+                "data": [result_data],
             }
 
             return Response(response_data)
 
         except Ticket.DoesNotExist:
-            return Response({"error": "Билет с указанным кодом бронирования не найден."}, status=404)
+            return Response(
+                {"error": "Билет с указанным кодом бронирования не найден."}, status=404
+            )
         except Exception as e:
             return Response({"error": f"Произошла ошибка: {str(e)}"}, status=500)
 
-    @action(detail=False, methods=["get"], url_path="full-report")
-    def full_report(self, request):
+    @action(detail=False, methods=["get"], url_path="short-summary")
+    def full_report(self):
         today = date(2017, 12, 28)
         thirty_days_ago = today - timedelta(days=30)
 
@@ -255,8 +294,89 @@ class AmenityViewSet(viewsets.ModelViewSet):
 
         return Response(response)
 
-    @action(detail=False, url_path="amenities-tickets")
-    def amenities_tickets(self, request):
-        items = AmenityTicket.objects.all()
-        serializer = AmenityTicketSerializer(items, many=True)
-        return Response(serializer.data)
+    @action(
+        detail=False,
+        methods=["POST"],
+        url_path="purchase-amenities-for-ticket/(?P<id>\d+)",
+    )
+    def purchase_amenities(self, request, id):
+        # Get ticket
+        try:
+            ticket = Ticket.objects.get(id=id)
+        except Ticket.DoesNotExist:
+            return Response({"error": "Invalid ticket id"}, status=400)
+
+        # Get amenities to add
+        amenities_ids = request.data.get("amenities_id")
+        if not amenities_ids:
+            return Response({"error": "No amenities specified"})
+
+        try:
+            amenities = Amenity.objects.filter(id__in=amenities_ids)
+        except Amenity.DoesNotExist:
+            return Response({"error": "Invalid amenity id"})
+
+        # Add each amenity to ticket, checking for existence first
+        for amenity in amenities:
+            # Check if the pair already exists
+            if AmenityTicket.objects.filter(ticket=ticket, amenity=amenity).exists():
+                return Response(
+                    {"error": "Amenity already purchased for this ticket"}, status=400
+                )
+
+            # Create the AmenityTicket entry
+            try:
+                AmenityTicket.objects.create(ticket=ticket, amenity=amenity)
+            except IntegrityError:
+                return Response({"error": "Failed to purchase amenity"}, status=500)
+
+        return Response({"message": "Amenities purchased successfully"})
+
+    @action(detail=False, methods=["POST"], url_path="amenities-report")
+    def amenities_report(self, request):
+        flight_id = request.data.get("flight_id")
+        start_date = request.data.get("start_date")
+        end_date = request.data.get("end_date")
+
+        if flight_id and not (start_date) and not (end_date):
+            amenity_tickets = AmenityTicket.objects.filter(
+                ticket__schedule__FlightNumber=flight_id
+            )
+        elif not (flight_id) and start_date and end_date:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+            amenity_tickets = AmenityTicket.objects.filter(
+                ticket__schedule__Date__range=[start_date, end_date]
+            )
+            print(amenity_tickets)
+
+        amenity_names = []
+        amenity_data = {
+            "Economy": [],
+            "Business": [],
+            "First Class": [],
+        }
+
+        for at in amenity_tickets:
+            amenity = at.amenity
+            cabin_class = at.ticket.cabin_type.name
+
+            print(amenity.name, cabin_class)
+
+            if amenity.name not in amenity_names:
+                amenity_names.append(amenity.name)
+                amenity_data["Economy"].append(0)
+                amenity_data["Business"].append(0)
+                amenity_data["First Class"].append(0)
+
+            amenity_index = amenity_names.index(amenity.name)
+            amenity_data[cabin_class][amenity_index] += 1
+
+        # Format response
+        response_data = {
+            "economy": amenity_data["Economy"],
+            "business": amenity_data["Business"],
+            "first": amenity_data["First Class"],
+        }
+
+        return Response({"amenities": amenity_names, "data": response_data})

@@ -11,10 +11,11 @@ POST {{BACKEND_URL}}/amenities/search/
 Authorization: Bearer {{login.access}}
 Content-Type: application/json
 {
-    "booking_reference": "SE3RD1",
+  "booking_reference": "SE3RD1"
 }
 
-/* Response
+/*
+Response:
 {
     "pessenger": {
         "name": "John Doe",
@@ -41,14 +42,7 @@ Content-Type: application/json
                     "default": true,
                     "selected": true
                 },
-                {
-                    "name": "Amenity 2",
-                    "price": 20
-                },
-                {
-                    "name": "Amenity 2",
-                    "price": 20
-                }
+                ...
             ]
         },
         {
@@ -71,15 +65,7 @@ Content-Type: application/json
                     "default": true,
                     "selected": true
                 },
-                {
-                    "id"
-                    "name": "Amenity 2",
-                    "price": 20
-                },
-                {
-                    "name": "Amenity 2",
-                    "price": 20
-                }
+                ...
             ]
         }
     ]
@@ -88,41 +74,42 @@ Content-Type: application/json
 
 
 ### Purchase amenities
-POST {{BACKEND_URL}}/amenities/purchase-amenities-for-ticket/123/
+POST {{BACKEND_URL}}/amenities/purchase-amenities-for-ticket/9445/
 # @ref login 
 Authorization: Bearer {{login.access}}
 Content-Type: application/json
 {
-    "amenities_id": [1, 2, 4, 5]
+    "amenities_id": [5]
 }
 
 
 /// Amenities statistics
 
-### Statistics by booking reference
+### Report by flight id
 # @ref login 
 POST {{BACKEND_URL}}/amenities/amenities-report/
 Authorization: Bearer {{login.access}}
 Content-Type: application/json
 {
-    "booking_reference":"SE3RD1",
+    "flight_id": 49,
     "start_date": null,
     "end_date": null
 }
 
 
-### Statistics by data range 
+### Report by data range 
 # @ref login 
 POST {{BACKEND_URL}}/amenities/amenities-report/
 Authorization: Bearer {{login.access}}
 Content-Type: application/json
 {
-    "booking_reference": null,
-    "start_date": "2020-01-01",
-    "end_date": "2020-01-31"
+    "flight_id": null,
+    "start_date": "2020-10-09",
+    "end_date": "2024-10-15"
 }
 
-/* Response
+/*
+Response
 {
     "amenities": ["Wi-Fi", "Extra Blanket", "Two Neighboring Seats Free", "Laptop Rental"],
     "data": {
@@ -136,7 +123,7 @@ Content-Type: application/json
 
 ### Amenities short summary (booking number and date range)
 # @ref login 
-GET {{BACKEND_URL}}/amenities/full-report/
+GET {{BACKEND_URL}}/amenities/short-summary/
 Content-Type: application/json
 {}
 

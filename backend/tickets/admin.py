@@ -15,7 +15,7 @@ class TicketAdmin(ImportExportModelAdmin):
     list_display = (
         "id",
         "user",
-        "schedule",
+        "schedule_info",
         "cabin_type",
         "first_name",
         "last_name",
@@ -35,7 +35,7 @@ class TicketAdmin(ImportExportModelAdmin):
         return f"{obj.user.first_name} {obj.user.last_name}"
 
     def schedule_info(self, obj):
-        return f"{obj.schedule.Date} - {obj.schedule.aircraft_name}"
+        return f"{obj.schedule.FlightNumber}, {obj.schedule.Route.DepartureAirport.IATACode} - {obj.schedule.Route.ArrivalAirport.IATACode}, {obj.schedule.Date}, {obj.schedule.Time}"
 
     def cabin_type_info(self, obj):
         return obj.cabin_type.name
@@ -43,5 +43,6 @@ class TicketAdmin(ImportExportModelAdmin):
     user_info.short_description = "User"
     schedule_info.short_description = "Schedule"
     cabin_type_info.short_description = "Cabin Type"
+
 
 admin.site.register(Ticket, TicketAdmin)
