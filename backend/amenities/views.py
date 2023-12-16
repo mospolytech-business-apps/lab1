@@ -223,26 +223,24 @@ class AmenityViewSet(viewsets.ModelViewSet):
             100 * (seats_this_week - tickets_this_week.count()) / seats_this_week
         )
 
-        # two weeks ago
-        two_weeks_ago = today - timedelta(weeks=2)
+        # last week
+        last_week = today - timedelta(weeks=2)
         tickets_last_week = Ticket.objects.filter(
-            schedule__Date__range=[two_weeks_ago, today]
+            schedule__Date__range=[last_week, today]
         )
-        schedules_last_week = Schedule.objects.filter(
-            Date__range=[two_weeks_ago, today]
-        )
+        schedules_last_week = Schedule.objects.filter(Date__range=[last_week, today])
         seats_last_week = sum(s.Aircraft.TotalSeats for s in schedules_last_week)
         empty_pct_last_week = (
             100 * (seats_last_week - tickets_last_week.count()) / seats_last_week
         )
 
-        # three weeks ago
-        three_weeks_ago = today - timedelta(weeks=3)
+        # two weeks ago
+        two_weeks_ago = today - timedelta(weeks=3)
         tickets_two_weeks_ago = Ticket.objects.filter(
-            schedule__Date__range=[three_weeks_ago, today]
+            schedule__Date__range=[two_weeks_ago, today]
         )
         schedules_two_weeks_ago = Schedule.objects.filter(
-            Date__range=[three_weeks_ago, today]
+            Date__range=[two_weeks_ago, today]
         )
         seats_two_weeks_ago = sum(
             s.Aircraft.TotalSeats for s in schedules_two_weeks_ago
@@ -283,9 +281,9 @@ class AmenityViewSet(viewsets.ModelViewSet):
                 "three_days_ago": three_days_ago_revenue,
             },
             "weekly_seats_empty": {
-                "yesterday": truncate(empty_pct_this_week, 2),
-                "two_days_ago": truncate(empty_pct_last_week, 2),
-                "three_days_ago": truncate(empty_pct_two_weeks_ago, 2),
+                "this_week": truncate(empty_pct_this_week, 2),
+                "last_week": truncate(empty_pct_last_week, 2),
+                "two_weeks_ago": truncate(empty_pct_two_weeks_ago, 2),
             },
         }
 

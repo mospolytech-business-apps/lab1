@@ -1,3 +1,27 @@
+<script setup>
+import { api } from "@/api";
+import { ref, onMounted } from "vue";
+import Cookies from "js-cookie";
+import { useNotificationsStore } from "@/stores/notifications.store";
+
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import UINav from "@/components/UINav.vue";
+
+const { addError } = useNotificationsStore();
+
+const shortSummary = ref(null);
+onMounted(async () => {
+  const { res, err } = await api.getShortSummary(Cookies.get("ACCESS_TOKEN"));
+  if (err !== null) {
+    shortSummary.value = res;
+    addError("🚨 Error, loading short summary: ", err);
+  }
+
+  shortSummary.value = res;
+});
+</script>
+
 <template>
   <UIHeader title="Airlines Short Summary" />
   <UINav />
@@ -11,44 +35,101 @@
         <p>Number confirmed:</p>
         <p>Number canceled:</p>
         <p>Average daily flight time</p>
-        <p>[XXX]</p>
-        <p>[XXX]</p>
-        <p>[XXX] minutes</p>
+        <p>
+          <b>{{ shortSummary?.flights?.average_daily_flight_time ?? "–" }}</b>
+        </p>
+        <p>
+          <b>{{ shortSummary?.flights?.cancelled ?? "–" }}</b>
+        </p>
+        <p>
+          <b>{{ shortSummary?.flights?.confirmed ?? "–" }}</b>
+        </p>
       </fieldset>
       <fieldset class="stat">
         <legend>Top Customers (Number of purchases)</legend>
-        <p>Dohn Doe (5 Tickets)</p>
-        <p>Dohn Doe (3 Tickets)</p>
-        <p>Dohn Doe (2 Tickets)</p>
+        <p v-for="(client, i) in shortSummary?.top_clients">
+          {{ `${i + 1}. ` + client?.name ?? "–" }}
+          <b> ({{ client?.flights ?? "–" }} </b>
+          Tickets)
+        </p>
       </fieldset>
       <fieldset class="stat columns">
         <legend>Number of passengers flying</legend>
         <p>Busiest day:</p>
         <p>Most quiet day:</p>
-        <p>[dd/mm] with [XXX] flying</p>
-        <p>[dd/mm] with [XXX] flying</p>
+        <p>
+          <b>
+            {{
+              shortSummary?.number_of_passengers?.quietest?.day?.replace(
+                /-/g,
+                "/"
+              ) ?? "–"
+            }}
+          </b>
+          with
+          <b>
+            {{ shortSummary?.number_of_passengers?.quietest?.flights ?? "–" }}
+            planes
+          </b>
+          flying
+        </p>
+        <p>
+          <b>
+            {{
+              shortSummary?.number_of_passengers?.busiest?.day?.replace(
+                /-/g,
+                "/"
+              ) ?? "–"
+            }}
+          </b>
+          with
+          <b>
+            {{ shortSummary?.number_of_passengers?.busiest?.flights ?? "–" }}
+            planes
+          </b>
+          flying
+        </p>
       </fieldset>
       <fieldset class="stat">
         <legend>Top AMONIC Airlines Offices (Revenue)</legend>
-        <p>1. Abu Dhabi</p>
-        <p>2. Bahrain</p>
-        <p>3. Cairo.</p>
+        <p v-for="(office, i) in shortSummary?.top_offices">
+          {{ `${i + 1}. ` + office?.name ?? "–" }}
+        </p>
       </fieldset>
     </fieldset>
     <fieldset>
       <legend>Revenue from ticket sales</legend>
-      <p>Yesterday: $[XXX]</p>
-      <p>Two days ago: $[XXX]</p>
-      <p>Three days ago: $[XXX]</p>
+      <p>
+        Yesterday: <b>${{ shortSummary?.revenue?.yesterday ?? "–" }}</b>
+      </p>
+      <p>
+        Two days ago: <b>${{ shortSummary?.revenue?.two_days_ago ?? "–" }}</b>
+      </p>
+      <p>
+        Three days ago:
+        <b>${{ shortSummary?.revenue?.three_days_ago ?? "–" }}</b>
+      </p>
     </fieldset>
     <fieldset>
       <legend>Weakly report of percentage of empty seats</legend>
-      <p>This week: [XX]%</p>
-      <p>Last week: [XX]%</p>
-      <p>Three weeks ago: [XX]%</p>
+      <p>
+        This week:
+        <b>{{ shortSummary?.weekly_seats_empty?.this_week ?? "–" }}% </b>
+      </p>
+      <p>
+        Last week:
+        <b> {{ shortSummary?.weekly_seats_empty?.last_week ?? "–" }}% </b>
+      </p>
+      <p>
+        Three weeks ago:
+        <b> {{ shortSummary?.weekly_seats_empty?.two_weeks_ago ?? "–" }}% </b>
+      </p>
     </fieldset>
     <div class="bottom">
-      <p>Report generated in [XX] seconds</p>
+      <p>
+        Report generated in
+        <b>{{ shortSummary?.report_generated_in }} </b> seconds
+      </p>
       <UIButton class="make-report" @click="$router.push('/')">
         <img src="@/assets/cross-icon.png" width="25" alt="Close icon" />
         Close
@@ -56,12 +137,6 @@
     </div>
   </main>
 </template>
-
-<script setup>
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-import UINav from "@/components/UINav.vue";
-</script>
 
 <style scoped>
 p {

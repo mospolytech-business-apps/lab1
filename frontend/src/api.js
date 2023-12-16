@@ -460,4 +460,28 @@ export const api = {
       return { res: null, err: error };
     }
   },
+
+  // amenities
+  getShortSummary: async (accessToken) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/amenities/short-summary/`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
 };
