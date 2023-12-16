@@ -1,3 +1,55 @@
+<script setup>
+import { ref } from "vue";
+import { api } from "@/api";
+import Cookies from "js-cookie";
+import { useNotificationsStore } from "@/stores/notifications.store";
+
+import UIHeader from "@/components/UIHeader.vue";
+import UIButton from "@/components/UIButton.vue";
+import UINav from "@/components/UINav.vue";
+
+const { addError, addAlert } = useNotificationsStore();
+const reportResults = ref(null);
+
+const filter = ref({
+  flightID: null,
+  startDate: null,
+  endDate: null,
+});
+
+const applyFilter = async () => {
+  const allowRequest =
+    (filter.value.flightID !== null &&
+      filter.value.from === null &&
+      filter.value.to === null) ||
+    (filter.value.flightID === null &&
+      filter.value.from !== null &&
+      filter.value.to !== null);
+
+  if (!allowRequest) {
+    addAlert("You can only search by fligth id OR date range");
+    filter.value = {
+      flightID: null,
+      from: null,
+      to: null,
+    };
+    return;
+  }
+
+  const { res, err } = await api.getAmenitiesReport({
+    accessToken: Cookies.get("ACCESS_TOKEN"),
+    payload: filter.value,
+  });
+
+  if (err !== null) {
+    addError("Error, loading short summary: ", err);
+    return;
+  }
+
+  reportResults.value = res;
+};
+</script>
+
 <template>
   <UIHeader title="Amenities Report" />
   <UINav />
@@ -6,34 +58,49 @@
       <legend>Filter by</legend>
       <label class="field flight-id">
         <span class="label">Flight ID:</span>
-        <input class="input" type="text" placeholder="[ XXXXXX ]" />
+        <input
+          v-model="filter.flightID"
+          class="input"
+          type="text"
+          placeholder="[ XXXXXX ]"
+        />
       </label>
       <br />
       <label class="field">
         <span class="label">from: </span>
-        <input class="input" type="date" placeholder="[ XX/XX/XXXX ]" />
+        <input
+          v-model="filter.startDate"
+          class="input"
+          type="date"
+          placeholder="[ XX/XX/XXXX ]"
+        />
       </label>
       <label class="field">
         <span class="label">to: </span>
-        <input class="input" type="date" placeholder="[ XX/XX/XXXX ]" />
+        <input
+          v-model="filter.endDate"
+          class="input"
+          type="date"
+          placeholder="[ XX/XX/XXXX ]"
+        />
       </label>
       <UIButton class="make-report" @click="applyFilter">Make Report</UIButton>
     </fieldset>
     <div class="table-wrapper">
-      <table v-if="report.amenities" class="table">
+      <table v-if="reportResults?.amenities" class="table">
         <thead>
           <tr>
-            <th v-if="report.amenities">Amenities</th>
-            <th v-for="amenity in report.amenities" :key="amenity">
+            <th v-if="reportResults.amenities">Amenities</th>
+            <th v-for="amenity in reportResults?.amenities" :key="amenity">
               {{ amenity }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="stat in report.statistics" :key="flightClass">
-            <td>{{ stat.class }}</td>
-            <td v-for="amount in stat.data" :key="amount">
-              {{ amount || "–" }}
+          <tr v-for="(stat, k, i) in reportResults?.data" :key="i">
+            <td>{{ k }}</td>
+            <td v-for="amount in stat" :key="amount">
+              {{ amount || "0" }}
             </td>
           </tr>
         </tbody>
@@ -44,31 +111,6 @@
     </div>
   </main>
 </template>
-
-<script setup>
-import UIHeader from "@/components/UIHeader.vue";
-import UIButton from "@/components/UIButton.vue";
-import UINav from "@/components/UINav.vue";
-
-import { computed, ref } from "vue";
-
-const report = ref({});
-
-const apiUrl = "src/data/report.json";
-const fetchReport = async () => {
-  try {
-    const response = await fetch(apiUrl);
-    report.value = await response.json();
-    console.log(report.value);
-  } catch (error) {
-    console.error("Error fetching report:", error);
-  }
-};
-
-function applyFilter() {
-  fetchReport();
-}
-</script>
 
 <style scoped>
 .main {

@@ -15,7 +15,8 @@ onMounted(async () => {
   const { res, err } = await api.getShortSummary(Cookies.get("ACCESS_TOKEN"));
   if (err !== null) {
     shortSummary.value = res;
-    addError("🚨 Error, loading short summary: ", err);
+    addError("Error, loading short summary: ", err);
+    return;
   }
 
   shortSummary.value = res;

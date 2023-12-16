@@ -372,9 +372,9 @@ class AmenityViewSet(viewsets.ModelViewSet):
 
         # Format response
         response_data = {
-            "economy": amenity_data["Economy"],
-            "business": amenity_data["Business"],
-            "first": amenity_data["First Class"],
+            "Economy": amenity_data["Economy"],
+            "Business": amenity_data["Business"],
+            "First class": amenity_data["First Class"],
         }
 
         return Response({"amenities": amenity_names, "data": response_data})

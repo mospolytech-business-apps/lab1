@@ -484,4 +484,97 @@ export const api = {
       return { res: null, err: error };
     }
   },
+
+  getAmenitiesReport: async ({ accessToken, payload }) => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/amenities/amenities-report/`,
+        {
+          method: "POST",
+          headers: {
+            ...headers,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            flight_id: payload.flightID,
+            start_date: payload.startDate,
+            end_date: payload.endDate,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      return { res: data, err: null };
+    } catch (error) {
+      console.log(error);
+
+      return { res: null, err: error };
+    }
+  },
+
+  searchForAmenity: async ({ accessToken, payload }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/amenities/search/`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          from_airport: payload.from,
+          to_airport: payload.to,
+          cabin_type: payload.cabinType,
+          outbound_date: payload.onboardDate,
+          return_date: payload.returnDate,
+          wide_search: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
+
+  purchaseAmenity: async ({ accessToken, id, payload }) => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/amenities/purchase-amenities-for-ticket/${id}`,
+        {
+          method: "POST",
+          headers: {
+            ...headers,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            amenities_id: payload.amenitiesID,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      return { res: data, err: null };
+    } catch (error) {
+      return { res: null, err: error };
+    }
+  },
 };
