@@ -129,7 +129,7 @@ class AmenityViewSet(viewsets.ModelViewSet):
             return Response({"error": f"Произошла ошибка: {str(e)}"}, status=500)
 
     @action(detail=False, methods=["get"], url_path="short-summary")
-    def full_report(self):
+    def short_summary(self, request):
         today = date(2017, 12, 28)
         thirty_days_ago = today - timedelta(days=30)
 
